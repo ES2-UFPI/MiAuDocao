@@ -12,9 +12,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
         accentColor: Colors.amberAccent,
+        fontFamily: 'WorkSans',
         textTheme: ThemeData.light().textTheme.copyWith(
           headline6: TextStyle(
-            fontSize: 20
+            fontSize: 20,
+            fontFamily: 'WorkSans'
           )
         )
       ),
@@ -28,9 +30,21 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('MiAuDoção'),
+        title: Text(
+          'MiAuDoção',
+          style: TextStyle(
+            fontWeight: FontWeight.w700
+          ),
+        ),
       ),
-      body: Text('Este é o início do MiAuDoção')
+      body: Text(
+        'Este é o início do MiAuDoção',
+        style: TextStyle(
+          fontFamily: 'WorkSans',
+          fontWeight: FontWeight.w500,
+          fontSize: 16
+        )
+      )
     );
   }
 }
