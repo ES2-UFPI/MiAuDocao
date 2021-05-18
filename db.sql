@@ -13,5 +13,5 @@ CREATE TABLE animal (
     latitude FLOAT(10, 8) NOT NULL,
     longitude FLOAT(11, 8) NOT NULL,
     data_cadastro long,
-    foto BLOB
+    foto MEDIUMBLOB
 );
