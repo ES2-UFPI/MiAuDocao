@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid');
 const isBase64 = require('is-base64');
+const pool = require('../configs/db');
 
 exports.post = (req, res, next) => {
   const id = nanoid(20); // OK
@@ -46,12 +47,53 @@ exports.post = (req, res, next) => {
       || !photoIsBase64)
   {
     res.status(400).send({
-      type: 'Error',
+      type: 'Request error',
       description: "One or more parameters are invalid."
     });
 
     return;
   }
 
-  res.sendStatus(200);
+  /*
+    Query para o banco de dados
+
+    Aqui retorna 500 (Internal Server Error) caso falhe a conexão, 400 (Bad
+    Request) caso algum valor esteja inválido (no caso dos enums) ou 201
+    (Created) caso o animal tenha sido salvo com sucesso no banco de dados.
+  */
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+      id,
+      nome,
+      descricao,
+      especie,
+      porte,
+      sexo,
+      faixaEtaria,
+      endereco,
+      latitude,
+      longitude,
+      data_cadastro,
+      foto
+    ], function (error) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One or more values are invalid.'
+        });
+      } else {
+        res.status(201).send({
+          type: 'Created',
+          description: 'Animal added successfully.'
+        });
+      }
+    });
+  });
 }
