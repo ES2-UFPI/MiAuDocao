@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './utils/app_routes.dart';
+import './views/cadastrar_animal_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +22,10 @@ class MyApp extends StatelessWidget {
           )
         )
       ),
-      home: MyHomePage(),
+      routes: {
+        AppRoutes.HOME: (ctx) => MyHomePage(),
+        AppRoutes.CADASTRAR_ANIMAL: (ctx) => CadastrarAnimalScreen()
+      }
     );
   }
 }
@@ -44,7 +49,11 @@ class MyHomePage extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: 16
         )
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_ANIMAL),
+      ),
     );
   }
 }
