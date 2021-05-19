@@ -1,8 +1,9 @@
 const { nanoid } = require('nanoid');
 const isBase64 = require('is-base64');
+const sharp = require('sharp');
 const pool = require('../configs/db');
 
-exports.post = (req, res, next) => {
+exports.post = async (req, res, next) => {
   const id = nanoid(20); // OK
   const nome = req.body.nome;
   const descricao = req.body.descricao;
@@ -54,6 +55,20 @@ exports.post = (req, res, next) => {
     return;
   }
 
+  // Compressão da imagem
+  const parts = foto.split(';');
+  const mimType = parts[0].split(':')[1];
+  const imageData = parts[1].split(',')[1];
+  const img = new Buffer.from(imageData, 'base64');
+  const buffer = await sharp(img)
+    .resize({
+      fit: sharp.fit.contain,
+      width: 800
+    })
+    .toBuffer();
+  const resizedImageData = buffer.toString('base64');
+  const resizedImage = `data:${mimType};base64,${resizedImageData}`;
+
   /*
     Query para o banco de dados
 
@@ -80,7 +95,7 @@ exports.post = (req, res, next) => {
       latitude,
       longitude,
       data_cadastro,
-      foto
+      resizedImage
     ], function (error) {
       connection.release();
       if (error) {
