@@ -17,7 +17,8 @@
     "is-base64": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
-    "nanoid": "^3.1.23"
+    "nanoid": "^3.1.23",
+    "sharp": "^0.28.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
