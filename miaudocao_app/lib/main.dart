@@ -44,8 +44,13 @@ class MyHomePage extends StatelessWidget {
           fontSize: 16
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        label: Row(
+          children: [
+            Icon(Icons.add),
+            Text('Cadastrar animal')
+          ],
+        ),
         onPressed: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_ANIMAL),
       ),
     );
