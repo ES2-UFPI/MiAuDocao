@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/animal_form.dart';
 
 class CadastrarAnimalScreen extends StatelessWidget {
   @override
@@ -12,7 +13,9 @@ class CadastrarAnimalScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(),
+      body: Container(
+        child: AnimalForm(),
+      ),
     );
   }
 }
