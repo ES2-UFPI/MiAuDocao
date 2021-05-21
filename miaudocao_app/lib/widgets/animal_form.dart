@@ -1,17 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:miaudocao_app/utils/places_service.dart';
-import 'package:miaudocao_app/widgets/centralized_tip_text.dart';
-import 'package:miaudocao_app/widgets/input_button.dart';
+import '../models/animal.dart';
+import '../utils/places_service.dart';
+import 'centralized_tip_text.dart';
+import 'input_button.dart';
 import 'custom_textfield.dart';
 import 'custom_dropdown_button.dart';
 import 'search_address_modal.dart';
-import 'package:dio/dio.dart';
 
 class AnimalForm extends StatefulWidget {
+  final void Function(Animal, BuildContext) submitRegister;
+  AnimalForm(this.submitRegister);
+
   @override
   _AnimalFormState createState() => _AnimalFormState();
 }
@@ -31,10 +35,6 @@ class _AnimalFormState extends State<AnimalForm> {
   // TextField controllers
   final _nomeInputController = TextEditingController();
   final _descricaoInputController = TextEditingController();
-
-  // Atributos de um animal provisoriamente declarados aqui (sem um model)
-  //String _nome;
-  //String _descricao;
   String _endereco;
   Coordinates _coordinates;
   String _especieSelecionada;
@@ -115,37 +115,20 @@ class _AnimalFormState extends State<AnimalForm> {
     Navigator.of(context).pop();
   }
 
-  _submitRegister() async {
-    // Validação e execução da requisição POST para a MiAuDoção API
-    // print('Todos os dados de um animal a ser cadastrado:');
-    // print(_nomeInputController.text);
-    // print(_descricaoInputController.text);
-    // print(_endereco);
-    // print('Lat: ${_coordinates.latitude}, Long: ${_coordinates.longitude}');
-    // print(_especieSelecionada);
-    // print(_porteSelecionado);
-    // print(_sexoSelecionado);
-    // print(_faixaEtariaSelecionada);
-    // print(_foto);
-
-    final response = await this._dio.post(
-      'http://192.168.0.107:3000/animais', 
-      data: json.encode({
-        'nome': _nomeInputController.text,
-        'descricao': _descricaoInputController.text,
-        'especie': _especieSelecionada.toLowerCase(),
-        'porte': _porteSelecionado.toLowerCase(),
-        'sexo': _sexoSelecionado.toLowerCase(),
-        'faixa_etaria': _faixaEtariaSelecionada.toLowerCase(),
-        'endereco': _endereco,
-        'latitude': _coordinates.latitude.toString(),
-        'longitude': _coordinates.longitude.toString(),
-        'foto': _foto,
-      })
+  _submitForm(BuildContext context) {
+    Animal animal = Animal(
+      nome: _nomeInputController.text,
+      descricao: _descricaoInputController.text,
+      foto: _foto,
+      especie: _especieSelecionada.toLowerCase(),
+      porte: _porteSelecionado.toLowerCase(),
+      sexo: _sexoSelecionado.toLowerCase(),
+      faixaEtaria: _faixaEtariaSelecionada.toLowerCase(),
+      endereco: _endereco,
+      coordinates: _coordinates
     );
 
-    print(response.data);
-
+    widget.submitRegister(animal, context);
   }
 
   @override
@@ -249,12 +232,9 @@ class _AnimalFormState extends State<AnimalForm> {
               label: _endereco == null ? 'Procurar endereço' : _endereco,
               icon: Icon(Icons.pin_drop),
             ),
-            // Text(
-            //   _coordinates == null ? '' : 'Lat: ${_coordinates.latitude}, Long: ${_coordinates.longitude}'
-            // ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => _submitRegister(),
+              onPressed: () => _submitForm(context),
               child: Text('Cadastrar animal')
             )
           ],
