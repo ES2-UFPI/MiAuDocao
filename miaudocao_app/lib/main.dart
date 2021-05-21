@@ -14,13 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
         accentColor: Colors.amberAccent,
-        fontFamily: 'WorkSans',
-        textTheme: ThemeData.light().textTheme.copyWith(
-          headline6: TextStyle(
-            fontSize: 20,
-            fontFamily: 'WorkSans'
-          )
-        )
+        fontFamily: 'WorkSans'
       ),
       routes: {
         AppRoutes.HOME: (ctx) => MyHomePage(),
