@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../models/animal.dart';
 import '../utils/places_service.dart';
 import 'centralized_tip_text.dart';
@@ -91,16 +92,15 @@ class _AnimalFormState extends State<AnimalForm> {
   }
 
   _openSearchAddressModal(BuildContext context) {
-    showModalBottomSheet(
+    showBarModalBottomSheet(
+      context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(20),
           topRight: const Radius.circular(20)
-        )
+        ),
       ),
-      context: context,
-      isScrollControlled: false,
-      builder: (_) {
+      builder: (context) {
         return SearchAddressModal(_setAddressAndCoordinates);
       }
     );

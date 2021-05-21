@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:miaudocao_app/widgets/custom_textfield.dart';
 import '../utils/places_service.dart';
 
@@ -14,6 +15,7 @@ class _SearchAddressModalState extends State<SearchAddressModal> {
   AutocompleteApi _placeApi = AutocompleteApi.instance;
   DetailsApi _detailsApi = DetailsApi.instance;
   bool searching = false;
+  bool gettingDetails = false;
   List<Place> _predictions = [];
   Coordinates _coordinates;
 
@@ -48,8 +50,9 @@ class _SearchAddressModalState extends State<SearchAddressModal> {
         });
   }
 
-  _getDetails(String description, String placeId) {
-    //print(placeId);
+  _getDetails(String description, String placeId, BuildContext context) {
+    context.loaderOverlay.show();
+    FocusScope.of(context).unfocus();
     _detailsApi
         .getCoordinates(placeId)
         .asStream()
@@ -61,63 +64,64 @@ class _SearchAddressModalState extends State<SearchAddressModal> {
             });
           }
         });
+    //context.loaderOverlay.hide();
   }
   
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.only(
-            top: 25,
-            left: 16, 
-            right: 16, 
-            bottom: 16
-          ),
-          child: Column(
-            children: [
-              Text(
-                'Buscar endereço',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold
+    return LoaderOverlay(
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.only(
+              top: 25,
+              left: 16, 
+              right: 16, 
+              bottom: 16
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Buscar endereço',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'Selecione o endereço exato ou o mais próximo possível de onde se encontra o animal.',
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10),
-              CustomTextField(
-                hint: 'Digite o endereço',
-                maxLength: 50,
-                suffixIcon: Icon(Icons.search),
-                onChanged: this._inputOnChanged,
-              ),
-              SizedBox(height: 10),
-            ],
+                SizedBox(height: 5),
+                Text(
+                  'Selecione o endereço exato ou o mais próximo possível de onde se encontra o animal.',
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                CustomTextField(
+                  hint: 'Digite o endereço',
+                  maxLength: 50,
+                  suffixIcon: Icon(Icons.search),
+                  onChanged: this._inputOnChanged,
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Container(
-            child: searching
-              ? CircularProgressIndicator()
-              : ListView.builder(
-                  itemCount: _predictions.length,
-                  itemBuilder: (_, i) {
-                    final Place item = _predictions[i];
-                    //print(item.description);
-                    return ListTile(
-                      title: Text(item.description),
-                      leading: Icon(Icons.location_on),
-                      onTap: () => _getDetails(item.description, item.placeId),
-                    );
-                  },
-                )
-          ),
-        )
-      ],
+          searching
+            ? CircularProgressIndicator()
+            : Expanded(
+                child: ListView.builder(
+                    itemCount: _predictions.length,
+                    itemBuilder: (_, i) {
+                      final Place item = _predictions[i];
+                      //print(item.description);
+                      return ListTile(
+                        title: Text(item.description),
+                        leading: Icon(Icons.location_on),
+                        onTap: () => _getDetails(item.description, item.placeId, context),
+                      );
+                    },
+                  )
+                ),
+        ],
+      ),
     );
   }
 }
