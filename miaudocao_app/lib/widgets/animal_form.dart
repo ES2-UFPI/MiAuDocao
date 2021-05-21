@@ -36,7 +36,7 @@ class _AnimalFormState extends State<AnimalForm> {
   // TextField controllers
   final _nomeInputController = TextEditingController();
   final _descricaoInputController = TextEditingController();
-  String _endereco;
+  String _endereco = '';
   Coordinates _coordinates;
   String _especieSelecionada;
   String _porteSelecionado;
@@ -115,7 +115,30 @@ class _AnimalFormState extends State<AnimalForm> {
     Navigator.of(context).pop();
   }
 
+  _showSnackBar(BuildContext context, String message) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(message)
+      )
+    );
+  }
+
   _submitForm(BuildContext context) {
+    if (_nomeInputController.text.isEmpty
+      || _descricaoInputController.text.isEmpty || _foto == null
+      || _especieSelecionada == null || _porteSelecionado == null
+      || _sexoSelecionado == null || _faixaEtariaSelecionada == null
+      || _endereco == null || _coordinates == null
+    ) {
+      _showSnackBar(
+        context,
+        'Opa! Parece que você não preecheu todas as informações.'
+      );
+      return;
+    }
+
+
     Animal animal = Animal(
       nome: _nomeInputController.text,
       descricao: _descricaoInputController.text,
