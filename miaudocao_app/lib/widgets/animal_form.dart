@@ -233,9 +233,18 @@ class _AnimalFormState extends State<AnimalForm> {
               icon: Icon(Icons.pin_drop),
             ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () => _submitForm(context),
-              child: Text('Cadastrar animal')
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                //style: ElevatedButton.styleFrom(shape: StadiumBorder()),
+                onPressed: () => _submitForm(context),
+                child: Text(
+                  'Cadastrar animal',
+                  style: TextStyle(
+                    fontSize: 18
+                  ),
+                )
+              ),
             )
           ],
         ),
