@@ -25,6 +25,7 @@ class CustomDropdownButton extends StatelessWidget {
         child: ButtonTheme(
           alignedDropdown: true,
           child: DropdownButton(
+            onTap: () => FocusManager.instance.primaryFocus.unfocus(),
             hint: Text(hint),
             value: selectedItem,
             items: itemsList.map<DropdownMenuItem<String>> ((String value) {

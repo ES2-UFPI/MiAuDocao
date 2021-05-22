@@ -9,6 +9,9 @@ class CustomTextField extends StatelessWidget {
   final Function onTap;
   final Function onChanged;
   final TextEditingController controller;
+  final TextInputAction textInputAction;
+  final TextInputType keyboardType;
+  final TextCapitalization textCapitalization;
 
   CustomTextField({
     @required this.hint,
@@ -18,7 +21,10 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.onTap,
     this.onChanged,
-    this.controller
+    this.controller,
+    this.textInputAction,
+    this.keyboardType = TextInputType.text,
+    this.textCapitalization = TextCapitalization.none
   });
 
   @override
@@ -29,6 +35,9 @@ class CustomTextField extends StatelessWidget {
         color: Colors.grey.shade200
       ),
       child: TextField(
+        textCapitalization: textCapitalization,
+        textInputAction: textInputAction,
+        keyboardType: keyboardType,
         controller: controller,
         onTap: onTap,
         onChanged: onChanged,

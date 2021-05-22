@@ -36,7 +36,7 @@ class _AnimalFormState extends State<AnimalForm> {
   // TextField controllers
   final _nomeInputController = TextEditingController();
   final _descricaoInputController = TextEditingController();
-  String _endereco = '';
+  String _endereco;
   Coordinates _coordinates;
   String _especieSelecionada;
   String _porteSelecionado;
@@ -58,6 +58,7 @@ class _AnimalFormState extends State<AnimalForm> {
   ];
 
   void _openFileExplorer() async {
+    FocusManager.instance.primaryFocus.unfocus();
     setState(() => _loadingPath = true);
     try {
       _directoryPath = null;
@@ -92,6 +93,7 @@ class _AnimalFormState extends State<AnimalForm> {
   }
 
   _openSearchAddressModal(BuildContext context) {
+    FocusManager.instance.primaryFocus.unfocus();
     showBarModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -138,7 +140,6 @@ class _AnimalFormState extends State<AnimalForm> {
       return;
     }
 
-
     Animal animal = Animal(
       nome: _nomeInputController.text,
       descricao: _descricaoInputController.text,
@@ -178,6 +179,8 @@ class _AnimalFormState extends State<AnimalForm> {
               hint: 'Nome do animal',
               maxLength: 50,
               controller: _nomeInputController,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
             ),
             SizedBox(height: 10),
             CustomTextField(
@@ -186,6 +189,9 @@ class _AnimalFormState extends State<AnimalForm> {
               showCounter: true,
               multiline: true,
               controller: _descricaoInputController,
+              textCapitalization: TextCapitalization.sentences,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
             ),
             SizedBox(height: 10),
             InputButton(
