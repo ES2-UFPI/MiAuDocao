@@ -27,7 +27,6 @@ class _AnimalFormState extends State<AnimalForm> {
 
   String _fileName;
   List<PlatformFile> _paths;
-  String _directoryPath;
   String _extension;
   bool _loadingPath = false;
   bool _multiPick = false;
@@ -61,7 +60,6 @@ class _AnimalFormState extends State<AnimalForm> {
     FocusManager.instance.primaryFocus.unfocus();
     setState(() => _loadingPath = true);
     try {
-      _directoryPath = null;
       _paths = (await FilePicker.platform.pickFiles(
         type: _pickingType,
         allowMultiple: _multiPick,
@@ -72,10 +70,16 @@ class _AnimalFormState extends State<AnimalForm> {
           ?.files;
     } on PlatformException catch (e) {
       print("Unsupported operation" + e.toString());
-    } catch (ex) {
-      print(ex);
+    } catch (e) {
+      print(e);
     }
     if (!mounted) return;
+
+    if (_paths == null) {
+      setState(() => _loadingPath = false);
+      return;
+    }
+    
     setState(() {
       _loadingPath = false;
       print(_paths.first.extension);
@@ -198,7 +202,11 @@ class _AnimalFormState extends State<AnimalForm> {
               onTap: () => _openFileExplorer(),
               label: _loadingPath
                   ? 'Abrindo explorador...'
-                  : _fileName == null ? 'Selecionar imagem' : _fileName,
+                  : _paths == null
+                    ? _fileName == null
+                      ? 'Selecionar imagem'
+                      : _fileName
+                    : _fileName,     
               icon: Icon(Icons.photo)
             ),
             SizedBox(height: 16),
