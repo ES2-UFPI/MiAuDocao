@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './utils/app_routes.dart';
+import './views/cadastrar_animal_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,15 +14,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
         accentColor: Colors.amberAccent,
-        fontFamily: 'WorkSans',
-        textTheme: ThemeData.light().textTheme.copyWith(
-          headline6: TextStyle(
-            fontSize: 20,
-            fontFamily: 'WorkSans'
-          )
-        )
+        fontFamily: 'WorkSans'
       ),
-      home: MyHomePage(),
+      routes: {
+        AppRoutes.HOME: (ctx) => MyHomePage(),
+        AppRoutes.CADASTRAR_ANIMAL: (ctx) => CadastrarAnimalScreen()
+      }
     );
   }
 }
@@ -44,7 +43,16 @@ class MyHomePage extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: 16
         )
-      )
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        label: Row(
+          children: [
+            Icon(Icons.add),
+            Text('Cadastrar animal')
+          ],
+        ),
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_ANIMAL),
+      ),
     );
   }
 }
