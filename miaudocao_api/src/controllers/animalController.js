@@ -3,6 +3,53 @@ const { compressImage } = require('../utils/images');
 const isBase64 = require('is-base64');
 const pool = require('../configs/db');
 
+exports.get = async (req, res, next) => {
+  const id = req.params.id;
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    connection.query(`SELECT * FROM animal WHERE id = ?`, [
+      id
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One or more values are invalid.'
+        });
+      } else {
+        if (results[0]) {
+          let data = {
+            id: results[0].id,
+            nome: results[0].nome,
+            descricao: results[0].descricao,
+            especie: results[0].especie,
+            porte: results[0].porte,
+            sexo: results[0].sexo,
+            faixa_etaria: results[0].faixa_etaria,
+            endereco: results[0].endereco,
+            latitude: results[0].latitude,
+            longitude: results[0].longitude,
+            data_cadastro: results[0].data_cadastro,
+            foto: results[0].foto.toString()
+          }
+          res.status(200).json(data);
+        } else {
+          res.status(404).send({
+            type: 'Not found',
+            description: 'The requested data was not found in database.'
+          });
+        }
+      }
+    });
+  });
+
+}
+
 exports.post = async (req, res, next) => {
   const id = nanoid(20); // OK
   const nome = req.body.nome;
