@@ -59,6 +59,7 @@ exports.get = async (req, res, next) => {
         connection.query(geoQuery ? geoQuery : query,
             dados,
             function (error, results) {
+              connection.release();
                 if (error) {
                     res.status(400).send({
                         type: 'Database error',
