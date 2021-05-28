@@ -33,7 +33,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     try {
       final response = await this
           ._dio
-          .get('http://localhost:3000/animais/${widget._animalId}');
+          .get('https://miaudocao.herokuapp.com/animais/${widget._animalId}');
 
       return Animal.fromJson(response.data);
     } catch (e) {

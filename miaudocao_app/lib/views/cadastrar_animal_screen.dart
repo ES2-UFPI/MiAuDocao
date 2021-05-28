@@ -44,7 +44,7 @@ class CadastrarAnimalScreen extends StatelessWidget {
     context.loaderOverlay.show();
     try {
       final response = await this._dio.post(
-        'http://192.168.0.107:3000/animais', 
+        'https://miaudocao.herokuapp.com/animais', 
         data: json.encode({
           'nome': animal.nome,
           'descricao': animal.descricao,
