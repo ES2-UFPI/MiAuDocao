@@ -15,6 +15,8 @@ class Animal {
   final Coordinates coordinates;
   final String id;
   final String dataCadastro;
+  final double distancia;
+  final int data;
 
   Animal(
       {@required this.nome,
@@ -27,7 +29,9 @@ class Animal {
       @required this.endereco,
       @required this.coordinates,
       this.id,
-      this.dataCadastro});
+      this.dataCadastro,
+      this.distancia,
+      this.data});
 
   static Animal fromJson(Map<String, dynamic> json) {
     return Animal(
@@ -42,6 +46,8 @@ class Animal {
         coordinates: Coordinates(
             latitude: json['latitude'], longitude: json['longitude']),
         id: json['id'],
-        dataCadastro: json['data_cadastro']);
+        dataCadastro: json['data_cadastro'],
+        distancia: json['distance'],
+        data: int.parse(json['data_cadastro']));
   }
 }
