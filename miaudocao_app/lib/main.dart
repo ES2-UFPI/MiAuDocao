@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:miaudocao_app/widgets/custom_textfield.dart';
+import 'package:miaudocao_app/views/tabs_screen.dart';
 import './utils/app_routes.dart';
 import './views/cadastrar_animal_screen.dart';
-import 'utils/app_routes.dart';
-import 'utils/app_routes.dart';
+import 'package:miaudocao_app/widgets/custom_textfield.dart';
 import 'utils/app_routes.dart';
 import 'views/visualizar_animal_screen.dart';
 
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.amberAccent,
           fontFamily: 'WorkSans'),
       routes: {
-        AppRoutes.HOME: (ctx) => MyHomePage(),
+        AppRoutes.HOME: (ctx) => TabsScreen(),
         AppRoutes.CADASTRAR_ANIMAL: (ctx) => CadastrarAnimalScreen()
       },
       onGenerateRoute: (settings) {
