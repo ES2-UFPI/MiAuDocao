@@ -13,12 +13,9 @@ class FullscreenImage extends StatelessWidget {
         body: Container(
           color: Colors.black,
           child: Center(
-            child: Hero(
-              tag: 'imageHero',
-              child: Image.memory(
-                base64Decode(image.split(',')[1]),
-                fit: BoxFit.cover,
-              ),
+            child: Image.memory(
+              base64Decode(image.split(',')[1]),
+              fit: BoxFit.cover,
             ),
           ),
         ),

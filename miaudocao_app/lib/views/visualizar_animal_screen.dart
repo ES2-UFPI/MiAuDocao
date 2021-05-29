@@ -33,7 +33,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     try {
       final response = await this
           ._dio
-          .get('http://localhost:3000/animais/${widget._animalId}');
+          .get('https://miaudocao.herokuapp.com/animais/${widget._animalId}');
 
       return Animal.fromJson(response.data);
     } catch (e) {
@@ -90,26 +90,22 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
                         children: [
                           Expanded(
                             flex: 4,
-                            child: GestureDetector(
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      boxShadow: kElevationToShadow[4]),
-                                  child: Hero(
-                                    tag: 'imageHero',
-                                    child: Image.memory(
-                                      base64Decode(
-                                          snapshot.data.foto.split(',')[1]),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                  boxShadow: kElevationToShadow[4]),
+                              child: GestureDetector(
+                                child: Image.memory(
+                                  base64Decode(
+                                      snapshot.data.foto.split(',')[1]),
+                                  fit: BoxFit.cover,
                                 ),
-                                onTap: () {
-                                  Navigator.push(context,
+                                onTap: () => Navigator.push(context,
                                       MaterialPageRoute(builder: (_) {
                                     return FullscreenImage(snapshot.data.foto);
-                                  }));
-                                }),
+                                  })),
+                              ),
+                            ),
                           ),
                           Expanded(
                               flex: 6,
