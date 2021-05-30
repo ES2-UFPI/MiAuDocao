@@ -1,0 +1,27 @@
+{
+  "name": "miaudocao_api",
+  "version": "0.0.1",
+  "description": "API do app MiAuDocao",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "is-base64": "^1.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "nanoid": "^3.1.23",
+    "sharp": "^0.28.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
