@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -22,8 +21,6 @@ class AnimalForm extends StatefulWidget {
 }
 
 class _AnimalFormState extends State<AnimalForm> {  
-
-  final Dio _dio = Dio();
 
   String _fileName;
   List<PlatformFile> _paths;
