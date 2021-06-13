@@ -22,6 +22,8 @@
     "sharp": "^0.28.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "jest": "^27.0.4",
+    "nodemon": "^2.0.7",
+    "supertest": "^6.1.3"
   }
 }
