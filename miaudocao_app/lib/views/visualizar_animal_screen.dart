@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:measurer/measurer.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/utils/places_service.dart';
 import 'package:miaudocao_app/widgets/address_details_modal.dart';
 import 'package:miaudocao_app/widgets/address_info_card.dart';
@@ -33,7 +34,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     try {
       final response = await this
           ._dio
-          .get('https://miaudocao.herokuapp.com/animais/${widget._animalId}');
+          .get('${Configs.API_URL}/animais/${widget._animalId}');
 
       return Animal.fromJson(response.data);
     } catch (e) {

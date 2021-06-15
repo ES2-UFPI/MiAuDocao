@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/animal_item.dart';
 import 'package:miaudocao_app/widgets/centralized_tip_text.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
@@ -56,7 +57,7 @@ class _BuscaScreenState extends State<BuscaScreen> {
     setState(() => _isLoading = true);
     try {
       final response = await this._dio.get(
-        'https://miaudocao.herokuapp.com/busca',
+        '${Configs.API_URL}/busca',
         queryParameters: {
           'especie': _especie,
           'porte': _porte,
