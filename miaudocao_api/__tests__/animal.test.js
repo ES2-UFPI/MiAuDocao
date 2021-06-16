@@ -5,7 +5,6 @@ const { createUser, deleteAll } = require('../src/utils/dbTestUtils');
 
 describe('Animal POST', () => {
   afterAll(async () => {
-    deleteAll();
     pool.end();
   });
 
