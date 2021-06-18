@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
   final int maxLength;
   final bool showCounter;
   final bool multiline;
+  final bool obscureText;
   final Icon suffixIcon;
   final Function onTap;
   final Function onChanged;
@@ -18,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     @required this.maxLength,
     this.showCounter = false,
     this.multiline = false,
+    this.obscureText = false,
     this.suffixIcon,
     this.onTap,
     this.onChanged,
@@ -48,6 +50,7 @@ class CustomTextField extends StatelessWidget {
           counterText: showCounter ? null : "",
           suffixIcon: suffixIcon
         ),
+        obscureText: obscureText,
         maxLength: maxLength,
         maxLines: multiline ? null : 1,
         buildCounter: (_, {currentLength, maxLength, isFocused}) => Padding(
