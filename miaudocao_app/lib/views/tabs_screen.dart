@@ -4,6 +4,9 @@ import 'package:miaudocao_app/views/espaco_usuario_screen.dart';
 import 'package:miaudocao_app/views/explorar_screen.dart';
 
 class TabsScreen extends StatefulWidget {
+  final String connectedUserId;
+  TabsScreen(this.connectedUserId);
+
   @override
   _TabsScreenState createState() => _TabsScreenState();
 }
@@ -26,7 +29,7 @@ class _TabsScreenState extends State<TabsScreen> {
       },
       {
         'title': 'Meu espaço',
-        'screen': EspacoUsuarioScreen()
+        'screen': EspacoUsuarioScreen(connectedUserId: widget.connectedUserId)
       }
     ];
   }
