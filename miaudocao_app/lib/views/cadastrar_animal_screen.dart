@@ -11,6 +11,7 @@ import '../widgets/animal_form.dart';
 
 class CadastrarAnimalScreen extends StatelessWidget {
   final Dio _dio = Dio();
+  String userId;
 
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
@@ -47,6 +48,7 @@ class CadastrarAnimalScreen extends StatelessWidget {
       final response = await this._dio.post(
         '${Configs.API_URL}/animais', 
         data: json.encode({
+          'user_id': userId,
           'nome': animal.nome,
           'descricao': animal.descricao,
           'especie': animal.especie,
@@ -81,6 +83,7 @@ class CadastrarAnimalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    userId = ModalRoute.of(context).settings.arguments;
     return LoaderOverlay(
       child: Scaffold(
         appBar: AppBar(

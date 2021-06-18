@@ -25,7 +25,7 @@ class EspacoUsuarioScreen extends StatelessWidget {
             )
           ],
         ),
-        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_ANIMAL),
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_ANIMAL, arguments: connectedUserId),
       ),
     );
   }
