@@ -1,18 +1,14 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/utils/configs.dart';
-import '../models/animal.dart';
-import '../widgets/animal_form.dart';
+import 'package:miaudocao_app/widgets/user_form.dart';
 
-
-
-// ignore: must_be_immutable
-class CadastrarAnimalScreen extends StatelessWidget {
+class CadastrarUsuarioScreen extends StatelessWidget {
   final Dio _dio = Dio();
-  String userId = '';
 
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
@@ -43,29 +39,28 @@ class CadastrarAnimalScreen extends StatelessWidget {
     );
   }
 
-  _submitRegister(Animal animal, BuildContext context) async {
+  _submitRegister(Usuario usuario, BuildContext context) async {
     context.loaderOverlay.show();
     try {
       final response = await this._dio.post(
-        '${Configs.API_URL}/animais', 
+        '${Configs.API_URL}/usuario', 
         data: json.encode({
-          'user_id': userId,
-          'nome': animal.nome,
-          'descricao': animal.descricao,
-          'especie': animal.especie,
-          'porte': animal.porte,
-          'sexo': animal.sexo,
-          'faixa_etaria': animal.faixaEtaria,
-          'endereco': animal.endereco,
-          'latitude': animal.coordinates.latitude,
-          'longitude': animal.coordinates.longitude,
-          'foto': animal.foto,
+          'nome': usuario.nome,
+          'foto': usuario.foto,
+          'email': usuario.email,
+          'telefone': usuario.telefone,
+          'password': usuario.password,
+          'pref_especie': usuario.prefEspecie,
+          'pref_porte': usuario.prefPorte,
+          'pref_sexo': usuario.prefSexo,
+          'pref_faixa_etaria': usuario.prefFaixaEtaria,
+          'pref_raio_busca': usuario.prefRaioBusca
         })
       );
 
       context.loaderOverlay.hide();
       if (response.statusCode == 201) {
-        _showSnackBar(context, 'Animal cadastrado com sucesso!');
+        _showSnackBar(context, 'Usuário cadastrado com sucesso! Agora você pode fazer o login.');
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -84,19 +79,18 @@ class CadastrarAnimalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    userId = ModalRoute.of(context).settings.arguments;
     return LoaderOverlay(
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Cadastrar animal',
+            'Cadastro',
             style: TextStyle(
               fontWeight: FontWeight.w700
             ),
           ),
         ),
         body: Container(
-          child: AnimalForm(_submitRegister),
+          child: UserForm(_submitRegister),
         ),
       ),
     );
