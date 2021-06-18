@@ -6,6 +6,7 @@ const cors = require('cors');
 const index = require('./routes/index');
 const animalRoute = require('./routes/animalRoute');
 const buscaRoute = require('./routes/buscaRoute');
+const usuarioRoute = require('./routes/usuarioRoute');
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
@@ -21,5 +22,6 @@ app.use(cors(
 app.use('/', index);
 app.use('/animais', animalRoute);
 app.use('/busca', buscaRoute);
+app.use('/usuario', usuarioRoute);
 
 module.exports = app;
