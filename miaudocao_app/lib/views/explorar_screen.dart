@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:miaudocao_app/models/animal.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -108,7 +109,7 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
   Future<void> _fetchSearch() async {
     try {
       final response = await this._dio.get(
-        'https://miaudocao.herokuapp.com/busca',
+        '${Configs.API_URL}/busca',
         queryParameters: {
           'especie': _especie,
           'porte': _porte,

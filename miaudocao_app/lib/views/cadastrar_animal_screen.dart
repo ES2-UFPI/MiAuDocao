@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import '../models/animal.dart';
 import '../widgets/animal_form.dart';
 
@@ -44,7 +45,7 @@ class CadastrarAnimalScreen extends StatelessWidget {
     context.loaderOverlay.show();
     try {
       final response = await this._dio.post(
-        'https://miaudocao.herokuapp.com/animais', 
+        '${Configs.API_URL}/animais', 
         data: json.encode({
           'nome': animal.nome,
           'descricao': animal.descricao,

@@ -52,6 +52,7 @@ exports.get = async (req, res, next) => {
 
 exports.post = async (req, res, next) => {
   const id = nanoid(20); // OK
+  const user_id = req.body.user_id;
   const nome = req.body.nome;
   const descricao = req.body.descricao;
   const especie = req.body.especie;
@@ -74,6 +75,7 @@ exports.post = async (req, res, next) => {
     por tamanho para evitar que valores grandes passem para a fase de enviar a
     query.
   */
+  const userIdExceedsLimit = user_id.length > 20;
   const nameExceedsLimit = nome.length > 50;
   const descriptionExceedsLimit = descricao.length > 300;
   const especieExceedsLimit = especie.length > 20;
@@ -89,10 +91,10 @@ exports.post = async (req, res, next) => {
   // , addressExceedsLimit, latitudeAndLongitudeAreNumbers
   // , !photoIsBase64);
 
-  if (nameExceedsLimit || descriptionExceedsLimit || especieExceedsLimit
-      || animalSizeExceedsLimit || sexIsValid || ageRangeIsValid
-      || addressExceedsLimit || latitudeAndLongitudeAreNumbers
-      || !photoIsBase64)
+  if (userIdExceedsLimit || nameExceedsLimit || descriptionExceedsLimit
+      || especieExceedsLimit|| animalSizeExceedsLimit || sexIsValid
+      || ageRangeIsValid || addressExceedsLimit
+      || latitudeAndLongitudeAreNumbers || !photoIsBase64)
   {
     res.status(400).send({
       type: 'Request error',
@@ -120,31 +122,53 @@ exports.post = async (req, res, next) => {
         description: 'Something went wrong. Try again.'
       });
     }
-    connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-      id,
-      nome,
-      descricao,
-      especie,
-      porte,
-      sexo,
-      faixaEtaria,
-      endereco,
-      latitude,
-      longitude,
-      data_cadastro,
-      compressedImage
-    ], function (error) {
-      connection.release();
+
+    connection.query(`SELECT * FROM usuario WHERE id = ?`, [
+      user_id
+    ], function(error, results) {
       if (error) {
+        connection.release();
         res.status(400).send({
           type: 'Database error',
-          description: 'One or more values are invalid.'
+          description: 'One or more values are invalid (validating user).'
         });
       } else {
-        res.status(201).send({
-          type: 'Created',
-          description: 'Animal added successfully.'
-        });
+        if (results[0]) {
+          connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            id,
+            user_id,
+            nome,
+            descricao,
+            especie,
+            porte,
+            sexo,
+            faixaEtaria,
+            endereco,
+            latitude,
+            longitude,
+            data_cadastro,
+            compressedImage
+          ], function (error) {
+            connection.release();
+            if (error) {
+              console.log(error)
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid (creating animal).'
+              });
+            } else {
+              res.status(201).send({
+                type: 'Created',
+                description: 'Animal added successfully.'
+              });
+            }
+          });
+        } else {
+          res.status(404).send({
+            type: 'Not found',
+            description: 'The user (that supposed to be the animal owner) was not found in database.'
+          });
+        }
       }
     });
   });

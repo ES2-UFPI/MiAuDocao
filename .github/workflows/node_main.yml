@@ -27,6 +27,13 @@ jobs:
           npm install
           npm run build --if-present
           npm test
+        env:
+          CI: true
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
 
   deploy:
     name: Deploy API (Heroku)

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 
 class Place {
   final String placeId, description;
@@ -18,7 +19,7 @@ class AutocompleteApi {
   static AutocompleteApi get instance => AutocompleteApi._internal();
   final Dio _dio = Dio();
 
-  final apiKey = 'API_KEY';
+  final apiKey = Configs.MAPS_API_KEY;
 
   Future<List<Place>> searchPredictions(String input) async {
     try {
@@ -55,7 +56,7 @@ class DetailsApi {
   static DetailsApi get instance => DetailsApi._internal();
   final Dio _dio = Dio();
 
-  final apiKey = 'AIzaSyCQCqMN_YGLTyQMry-IrtQ_0uNAJ-gCErc';
+  final apiKey = Configs.MAPS_API_KEY;
   Future<Coordinates> getCoordinates(String placeId) async {
     try {
       final response = await this._dio.get(
