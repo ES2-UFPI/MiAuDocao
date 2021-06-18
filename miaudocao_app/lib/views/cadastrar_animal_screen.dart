@@ -9,9 +9,10 @@ import '../widgets/animal_form.dart';
 
 
 
+// ignore: must_be_immutable
 class CadastrarAnimalScreen extends StatelessWidget {
   final Dio _dio = Dio();
-  String userId;
+  String userId = '';
 
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
