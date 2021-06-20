@@ -8,7 +8,7 @@ describe('Animal POST', () => {
     pool.end();
   });
 
-  it('should register an animal successfully', async () => {
+  /*it('should register an animal successfully', async () => {
     const id = await createUser(); // criando um usuário e recebendo de volta o id que foi dado a ele
 
     const res = await request(app).post('/animais')
@@ -27,7 +27,7 @@ describe('Animal POST', () => {
       });
 
       expect(res.status).toBe(201);
-  });
+  });*/
 
   it('should refuse an animal register due to inexistent user', async () => {
     await createUser(); // cria um usuário qualquer
