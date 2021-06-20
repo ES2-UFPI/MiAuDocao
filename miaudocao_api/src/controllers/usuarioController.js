@@ -17,14 +17,15 @@ exports.get = async (req, res, next) => {
     connection.query(`SELECT * FROM usuario WHERE email = ?`, [
       email
     ], function (error, results) {
-      connection.release();
       if (error) {
+        connection.release();
         res.status(400).send({
           type: 'Database error',
           description: 'One or more values are invalid.'
         });
       } else {
         if (results[0]) {
+          connection.release();
           let data = {
             id: results[0].id,
             nome: results[0].nome,
@@ -40,9 +41,38 @@ exports.get = async (req, res, next) => {
           }
           res.status(200).json(data);
         } else {
-          res.status(404).send({
-            type: 'Not found',
-            description: 'The requested user was not found in database.'
+          connection.query(`SELECT * FROM usuario WHERE id = ?`, [
+            email
+          ], function (error, results) {
+            connection.release();
+            if (error) {
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid.'
+              });
+            } else {
+              if (results[0]) {
+                let data = {
+                  id: results[0].id,
+                  nome: results[0].nome,
+                  foto: results[0].foto.toString(),
+                  email: results[0].email,
+                  telefone: results[0].telefone,
+                  data_cadastro: results[0].data_cadastro,
+                  pref_especie: results[0].pref_especie,
+                  pref_porte: results[0].pref_porte,
+                  pref_sexo: results[0].pref_sexo,
+                  pref_faixa_etaria: results[0].pref_faixa_etaria,
+                  pref_raio_busca: results[0].pref_raio_buca
+                }
+                res.status(200).json(data);
+              } else {
+                res.status(404).send({
+                  type: 'Not found',
+                  description: 'The requested user was not found in database.'
+                });
+              }
+            }
           });
         }
       }
