@@ -33,3 +33,8 @@ CREATE TABLE animal (
     foto MEDIUMBLOB,
     FOREIGN KEY (user_id) REFERENCES usuario(id)
 );
+
+CREATE TABLE interesse_animal (
+    user_id VARCHAR(20) NOT NULL,
+    animal_id VARCHAR(20) NOT NULL
+);
