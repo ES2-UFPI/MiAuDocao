@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
-  const email = req.params.email;
+  const email = req.query.email;
 
   pool.getConnection((err, connection) => {
     if (err) {
@@ -175,5 +175,43 @@ exports.post = async (req, res, next) => {
         }
       }
     });
+  });
+}
+
+exports.getAnimais = async (req, res, next) => {
+  if (!req.query.user) {
+    res.status(400).send({
+      type: 'Database error',
+      description: 'One of more values are invalid.'
+    });
+
+    return;
+  }
+
+  const userId = req.query.user;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    connection.query(`SELECT * FROM animal WHERE user_id = ?`, [
+      userId
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One of more values are invalid.'
+        });
+      } else {
+        results.forEach((element, index) => {
+          results[index].foto = element.foto.toString();
+        });
+        res.status(200).send(results);
+      }
+    })
   });
 }

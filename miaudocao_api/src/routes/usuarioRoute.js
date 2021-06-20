@@ -3,6 +3,7 @@ const router = express.Router();
 const controller = require('../controllers/usuarioController');
 
 router.post('/', controller.post);
-router.get('/:email', controller.get);
+router.get('/', controller.get);
+router.get('/animais/', controller.getAnimais);
 
 module.exports = router;
