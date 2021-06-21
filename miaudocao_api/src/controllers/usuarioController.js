@@ -215,3 +215,38 @@ exports.getAnimais = async (req, res, next) => {
     })
   });
 }
+
+exports.getTenhoInteresse = (req, res, next) => {
+  const id = req.query.id;
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    
+    connection.query(`SELECT * FROM (
+        SELECT a.id, i.user_id, a.foto, a.nome, a.descricao
+        FROM animal a
+          INNER JOIN interesse_animal i
+          ON a.id = i.animal_id
+      ) AS r WHERE r.user_id = ?;
+      `, [
+      id
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'The animal does not exist.'
+        });
+      } else {
+        results.forEach((element, index) => {
+          results[index].foto = element.foto.toString();
+        });
+        res.status(200).send(results);
+      }
+    })
+  });
+}
