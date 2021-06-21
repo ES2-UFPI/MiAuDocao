@@ -4,7 +4,7 @@ const isBase64 = require('is-base64');
 const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
-  const id = req.params.id;
+  const id = req.query.id;
   pool.getConnection((err, connection) => {
     if (err) {
       res.status(500).send({
@@ -171,5 +171,38 @@ exports.post = async (req, res, next) => {
         }
       }
     });
+  });
+}
+
+exports.getInteressados = (req, res, next) => {
+  const id = req.query.id;
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    
+    connection.query(`SELECT u.id, u.foto, u.nome
+      FROM usuario u
+        INNER JOIN interesse_animal i
+        ON u.id = i.user_id
+      WHERE animal_id = ?;`, [
+      id
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'The animal does not exist.'
+        });
+      } else {
+        results.forEach((element, index) => {
+          results[index].foto = element.foto.toString();
+        });
+        res.status(200).send(results);
+      }
+    })
   });
 }
