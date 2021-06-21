@@ -206,3 +206,7 @@ exports.getInteressados = (req, res, next) => {
     })
   });
 }
+
+exports.marcarAdotado = (req, res, next) => {
+  
+}
