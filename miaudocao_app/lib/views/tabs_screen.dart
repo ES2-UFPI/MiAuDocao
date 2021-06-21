@@ -25,7 +25,7 @@ class _TabsScreenState extends State<TabsScreen> {
       },
       {
         'title': 'Busca',
-        'screen': BuscaScreen()
+        'screen': BuscaScreen(connectedUserId: widget.connectedUserId)
       },
       {
         'title': 'Meu espaço',
