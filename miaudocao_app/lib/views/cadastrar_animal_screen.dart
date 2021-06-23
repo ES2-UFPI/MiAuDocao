@@ -12,7 +12,8 @@ import '../widgets/animal_form.dart';
 // ignore: must_be_immutable
 class CadastrarAnimalScreen extends StatelessWidget {
   final Dio _dio = Dio();
-  String userId = '';
+  final String userId;
+  CadastrarAnimalScreen(this.userId);
 
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
@@ -84,7 +85,6 @@ class CadastrarAnimalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    userId = ModalRoute.of(context).settings.arguments;
     return LoaderOverlay(
       child: Scaffold(
         appBar: AppBar(

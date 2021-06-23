@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/views/cadastrar_usuario_screen.dart';
+import 'package:miaudocao_app/views/interessados_screen.dart';
 import 'package:miaudocao_app/views/tabs_screen.dart';
 import 'package:miaudocao_app/views/welcome_login_screen.dart';
 import './utils/app_routes.dart';
-import './views/cadastrar_animal_screen.dart';
 import 'utils/app_routes.dart';
 import 'views/visualizar_animal_screen.dart';
 
@@ -23,7 +24,6 @@ class MyApp extends StatelessWidget {
       routes: {
         //AppRoutes.HOME: (ctx) => TabsScreen(),
         AppRoutes.HOME: (ctx) => WelcomeLoginScreen(),
-        AppRoutes.CADASTRAR_ANIMAL: (ctx) => CadastrarAnimalScreen(),
         AppRoutes.CADASTRAR_USUARIO: (ctx) => CadastrarUsuarioScreen(),
       },
       onGenerateRoute: (settings) {
@@ -36,13 +36,20 @@ class MyApp extends StatelessWidget {
         }
 
         if (settings.name == AppRoutes.DASHBOARD) {
-          final String argument = settings.arguments;
+          final Usuario argument = settings.arguments;
 
           return MaterialPageRoute(builder: (context) {
             return TabsScreen(argument);
           });
         }
 
+        if (settings.name == AppRoutes.INTERESSADOS) {
+          final String argument = settings.arguments;
+
+          return MaterialPageRoute(builder: (context) {
+            return InteressadosScreen(argument);
+          });
+        }
 
         return null;
       },

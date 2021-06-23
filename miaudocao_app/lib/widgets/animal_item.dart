@@ -8,12 +8,16 @@ class AnimalItem extends StatelessWidget {
   final String nome;
   final String descricao;
   final String id;
+  final bool showOptions;
+  final Function showInteressados;
 
   AnimalItem({
     @required this.image,
     @required this.nome,
     @required this.descricao,
     @required this.id,
+    this.showOptions = false,
+    this.showInteressados
   });
 
   @override
@@ -53,6 +57,8 @@ class AnimalItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
               Container(
@@ -61,13 +67,29 @@ class AnimalItem extends StatelessWidget {
                   top: 5,
                   left: 10,
                   right: 10,
-                  bottom: 10
+                  bottom: 2
                 ),
                 child: Text(
                   descricao,
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
-              )
+              ),
+              showOptions 
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: showInteressados,
+                        child: Text('Ver interessados')
+                      ),
+                      TextButton(
+                        onPressed: ()=>{},
+                        child: Text('Marcar como adotado')
+                      )
+                    ],
+                  )
+                : SizedBox(height: 10)
             ],
           ),
         ),
