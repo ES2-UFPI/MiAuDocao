@@ -4,4 +4,5 @@ class AppRoutes {
   static const VISUALIZAR_ANIMAL = '/visualizar-animal';
   static const CADASTRAR_USUARIO = '/cadastrar-usuario';
   static const DASHBOARD = '/principal';
+  static const INTERESSADOS = '/interessados';
 }
