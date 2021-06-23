@@ -11,22 +11,18 @@ class WelcomeLoginScreen extends StatelessWidget {
 
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Text(message)
-      )
-    );
+    scaffold.showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _login(String email, BuildContext context) async {
     context.loaderOverlay.show();
     try {
-      final response = await this
-          ._dio
-          .get('${Configs.API_URL}/usuario/${email}');
+      final response =
+          await this._dio.get('${Configs.API_URL}/usuario?email=${email}');
       context.loaderOverlay.hide();
       if (response.statusCode == 200) {
-        Navigator.of(context).pushNamed(AppRoutes.DASHBOARD, arguments: Usuario.fromJson(response.data).id);
+        Navigator.of(context).pushNamed(AppRoutes.DASHBOARD,
+            arguments: Usuario.fromJson(response.data));
       }
     } catch (e) {
       context.loaderOverlay.hide();
@@ -107,9 +103,10 @@ class WelcomeLoginScreen extends StatelessWidget {
                       controller: _emailInputController,
                     ),
                     ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Colors.grey.shade200),
-                      onPressed: () => _login(_emailInputController.text, context),
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.grey.shade200),
+                      onPressed: () =>
+                          _login(_emailInputController.text, context),
                       child: Text('Entrar'),
                     )
                   ],
@@ -118,7 +115,8 @@ class WelcomeLoginScreen extends StatelessWidget {
                   children: [
                     Text('Não possui conta? '),
                     GestureDetector(
-                      onTap: () => Navigator.of(context).pushNamed(AppRoutes.CADASTRAR_USUARIO),
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(AppRoutes.CADASTRAR_USUARIO),
                       child: Text(
                         'Cadastre-se',
                         style: TextStyle(fontWeight: FontWeight.bold),
