@@ -5,7 +5,6 @@ import 'package:miaudocao_app/views/interessados_screen.dart';
 import 'package:miaudocao_app/views/tabs_screen.dart';
 import 'package:miaudocao_app/views/welcome_login_screen.dart';
 import './utils/app_routes.dart';
-import './views/cadastrar_animal_screen.dart';
 import 'utils/app_routes.dart';
 import 'views/visualizar_animal_screen.dart';
 
@@ -51,7 +50,6 @@ class MyApp extends StatelessWidget {
             return InteressadosScreen(argument);
           });
         }
-
 
         return null;
       },
