@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/views/busca_screen.dart';
 import 'package:miaudocao_app/views/espaco_usuario_screen.dart';
 import 'package:miaudocao_app/views/explorar_screen.dart';
 
 class TabsScreen extends StatefulWidget {
-  final String connectedUserId;
-  TabsScreen(this.connectedUserId);
+  final Usuario connectedUser;
+  TabsScreen(this.connectedUser);
 
   @override
   _TabsScreenState createState() => _TabsScreenState();
@@ -29,7 +30,7 @@ class _TabsScreenState extends State<TabsScreen> {
       },
       {
         'title': 'Meu espaço',
-        'screen': EspacoUsuarioScreen(connectedUserId: widget.connectedUserId)
+        'screen': EspacoUsuarioScreen(connectedUser: widget.connectedUser)
       }
     ];
   }
