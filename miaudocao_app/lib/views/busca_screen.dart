@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/animal_item.dart';
 import 'package:miaudocao_app/widgets/centralized_tip_text.dart';
@@ -32,6 +34,23 @@ class _BuscaScreenState extends State<BuscaScreen> {
   bool _isLoading = false;
 
   Future _animais;
+  Usuario _usuario;
+
+  void _getUserDetails(String id) async {
+    try {
+      await this
+          ._dio
+          .get('${Configs.API_URL}/usuario?email=${id}')
+          .then((response) {
+        setState(() {
+          _usuario = Usuario.fromJson(response.data);
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
 
   void _updateSearch(String especie, String porte, String sexo,
       String faixaEtaria, String ordenacao, double raio) async {
@@ -113,7 +132,13 @@ class _BuscaScreenState extends State<BuscaScreen> {
       return;
     }
 
-    setState(() {
+    setState(() async {
+      await _getUserDetails(widget.connectedUserId);
+      _especie = toBeginningOfSentenceCase(_usuario.prefEspecie);
+      _porte = toBeginningOfSentenceCase(_usuario.prefPorte);
+      _sexo = toBeginningOfSentenceCase(_usuario.prefSexo);
+      _faixaEtaria = toBeginningOfSentenceCase(_usuario.prefFaixaEtaria);
+      _raio = _usuario.prefRaioBusca.toDouble();
       _animais = _fetchSearch();
       _isLoading = false;
     });
@@ -177,8 +202,9 @@ class _BuscaScreenState extends State<BuscaScreen> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: CentralizedTipText(
-                title: 'Exibindo animais nas suas redondezas',
-                subtitle: 'Você pode aplicar filtros para refinar sua busca.',
+                title: 'Exibindo animais de acordo com suas preferências',
+                subtitle:
+                    'Você pode aplicar filtros para refinar sua busca ou alterar suas preferências no seu perfil.',
               ),
             ),
           Expanded(
