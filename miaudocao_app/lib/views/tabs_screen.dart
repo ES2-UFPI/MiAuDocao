@@ -20,13 +20,10 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
     _screens = [
-      {
-        'title': 'MiAuDoção',
-        'screen': ExplorarScreen()
-      },
+      {'title': 'MiAuDoção', 'screen': ExplorarScreen()},
       {
         'title': 'Busca',
-        'screen': BuscaScreen(connectedUserId: widget.connectedUserId)
+        'screen': BuscaScreen(connectedUserId: widget.connectedUser.id)
       },
       {
         'title': 'Meu espaço',
@@ -37,7 +34,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   _selectScreen(int index) {
     setState(() {
-    _selectedScreenIndex = index;
+      _selectedScreenIndex = index;
     });
   }
 
@@ -51,18 +48,10 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectedScreenIndex,
         onTap: _selectScreen,
         items: [
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Explorar'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Busca'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pets),
-            label: 'Explorar'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Busca'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Meu espaço'
-          )
+              icon: Icon(Icons.list_alt), label: 'Meu espaço')
         ],
       ),
     );
