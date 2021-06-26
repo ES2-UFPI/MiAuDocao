@@ -31,6 +31,7 @@ CREATE TABLE animal (
     longitude FLOAT(11, 8) NOT NULL,
     data_cadastro long,
     foto MEDIUMBLOB,
+	adotado BOOL,
     FOREIGN KEY (user_id) REFERENCES usuario(id)
 );
 

@@ -19,6 +19,7 @@ class Animal {
   final String dataCadastro;
   final double distancia;
   final int data;
+  final bool adotado;
 
   Animal(
       {@required this.nome,
@@ -35,7 +36,8 @@ class Animal {
       this.interessado,
       this.dataCadastro,
       this.distancia,
-      this.data});
+      this.data,
+      this.adotado});
 
   static Animal fromJson(Map<String, dynamic> json) {
     return Animal(
@@ -54,6 +56,7 @@ class Animal {
         interessado: json['interessado'],
         dataCadastro: json['data_cadastro'],
         distancia: json['distance'],
-        data: int.parse(json['data_cadastro']));
+        data: int.parse(json['data_cadastro']),
+        adotado: json['adotado'] == 1 ? true : false);
   }
 }
