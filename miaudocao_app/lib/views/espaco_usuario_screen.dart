@@ -186,6 +186,7 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
                             nome: snapshot.data[index].nome,
                             descricao: snapshot.data[index].descricao,
                             id: snapshot.data[index].id,
+                            userId: widget.connectedUser.id,
                             showOptions: true,
                             showInteressados: () => _onShowInteressados(context, snapshot.data[index].id)
                           );

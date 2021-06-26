@@ -20,7 +20,7 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
     _screens = [
-      {'title': 'MiAuDoção', 'screen': ExplorarScreen()},
+      {'title': 'MiAuDoção', 'screen': ExplorarScreen(connectedUserId: widget.connectedUser.id)},
       {
         'title': 'Busca',
         'screen': BuscaScreen(connectedUserId: widget.connectedUser.id)

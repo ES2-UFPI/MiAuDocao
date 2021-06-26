@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       },
       onGenerateRoute: (settings) {
         if (settings.name == AppRoutes.VISUALIZAR_ANIMAL) {
-          final String argument = settings.arguments;
+          final List<String> argument = settings.arguments;
 
           return MaterialPageRoute(builder: (context) {
             return VisualizarAnimalScreen(argument);

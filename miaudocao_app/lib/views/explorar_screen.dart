@@ -13,6 +13,9 @@ import 'package:miaudocao_app/widgets/search_filters_modal.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ExplorarScreen extends StatefulWidget {
+  final String connectedUserId;
+  ExplorarScreen({this.connectedUserId});
+
   @override
   _ExplorarScreenState createState() => _ExplorarScreenState();
 }
@@ -51,7 +54,7 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
           onTap: () => 
               Navigator.of(context).pushNamed(          
                 AppRoutes.VISUALIZAR_ANIMAL,
-                arguments: id
+                arguments: [id, widget.connectedUserId]
               ),
           consumeTapEvents: true
         )
