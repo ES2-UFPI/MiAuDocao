@@ -241,7 +241,8 @@ class _BuscaScreenState extends State<BuscaScreen> {
                         nome: snapshot.data[index].nome,
                         descricao: snapshot.data[index].descricao,
                         id: snapshot.data[index].id,
-                        userId: _usuario.id,);
+                        userId: _usuario.id,
+                        adotado: snapshot.data[index].adotado,);
                   },
                 );
               },
