@@ -155,7 +155,7 @@ exports.post = async (req, res, next) => {
         });
       } else {
         if (results[0]) {
-          connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+          connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
             id,
             user_id,
             nome,
@@ -168,7 +168,8 @@ exports.post = async (req, res, next) => {
             latitude,
             longitude,
             data_cadastro,
-            compressedImage
+            compressedImage,
+            0
           ], function (error) {
             connection.release();
             if (error) {
@@ -226,4 +227,36 @@ exports.getInteressados = (req, res, next) => {
       }
     })
   });
+}
+
+exports.marcarAdotado = (req, res, next) => {
+  const id = req.query.id;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+
+    connection.query(`UPDATE animal SET adotado = ? WHERE id = ?`, [
+      1,
+      id
+    ], function (error) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'The animal does not exist.'
+        });
+      } else {
+        res.status(200).send({
+          type: 'Updated',
+          description: 'The animal has been marked as adopted.'
+        });
+      }
+    })
+  })
+
 }
