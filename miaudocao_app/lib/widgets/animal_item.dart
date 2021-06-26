@@ -8,6 +8,7 @@ class AnimalItem extends StatelessWidget {
   final String nome;
   final String descricao;
   final String id;
+  final String userId;
   final bool showOptions;
   final Function showInteressados;
 
@@ -16,6 +17,7 @@ class AnimalItem extends StatelessWidget {
     @required this.nome,
     @required this.descricao,
     @required this.id,
+    @required this.userId,
     this.showOptions = false,
     this.showInteressados
   });
@@ -96,7 +98,7 @@ class AnimalItem extends StatelessWidget {
       ),
       onTap: () => Navigator.of(context).pushNamed(          
             AppRoutes.VISUALIZAR_ANIMAL,
-            arguments: id
+            arguments: [id, userId]
           ),
     );
   }
