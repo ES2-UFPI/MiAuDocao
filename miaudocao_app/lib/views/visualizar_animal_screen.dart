@@ -61,7 +61,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
   void _manifestarInteresse(BuildContext context) async {
     context.loaderOverlay.show();
     try {
-      final response = await this._dio.post(
+      await this._dio.post(
         '${Configs.API_URL}/manifestar_interesse',
         queryParameters: {
           'animal': widget._animalAndUserId[0],
