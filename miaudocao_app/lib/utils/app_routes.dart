@@ -5,4 +5,5 @@ class AppRoutes {
   static const CADASTRAR_USUARIO = '/cadastrar-usuario';
   static const DASHBOARD = '/principal';
   static const INTERESSADOS = '/interessados';
+  static const PERFIL = '/perfil';
 }

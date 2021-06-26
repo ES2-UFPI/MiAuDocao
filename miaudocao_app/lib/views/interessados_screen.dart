@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:miaudocao_app/utils/configs.dart';
+import 'package:miaudocao_app/views/perfil_usuario_screen.dart';
 
 class InteressadosScreen extends StatefulWidget {
   final String animalId;
@@ -87,6 +88,10 @@ class _InteressadosScreenState extends State<InteressadosScreen> {
                       )
                     ),
                     title: Text(snapshot.data[index]['nome']),
+                    onTap: () => Navigator.of(context)
+                      .push(MaterialPageRoute(
+                        builder: (context) => PerfilUsuarioScreen(snapshot.data[index]['id']),
+                      )),
                   ),
                 );
               },
