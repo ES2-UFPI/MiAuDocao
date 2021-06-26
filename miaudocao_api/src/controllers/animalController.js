@@ -5,6 +5,7 @@ const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
   const id = req.query.id;
+  const user = req.query.user;
   pool.getConnection((err, connection) => {
     if (err) {
       res.status(500).send({
@@ -15,8 +16,8 @@ exports.get = async (req, res, next) => {
     connection.query(`SELECT * FROM animal WHERE id = ?`, [
       id
     ], function (error, results) {
-      connection.release();
       if (error) {
+        connection.release();
         res.status(400).send({
           type: 'Database error',
           description: 'One or more values are invalid.'
@@ -25,6 +26,7 @@ exports.get = async (req, res, next) => {
         if (results[0]) {
           let data = {
             id: results[0].id,
+            user_id: results[0].user_id,
             nome: results[0].nome,
             descricao: results[0].descricao,
             especie: results[0].especie,
@@ -37,7 +39,26 @@ exports.get = async (req, res, next) => {
             data_cadastro: results[0].data_cadastro,
             foto: results[0].foto.toString()
           }
-          res.status(200).json(data);
+          connection.query(`SELECT * FROM interesse_animal WHERE user_id = ? AND animal_id = ?`, [
+            user,
+            id
+          ], function(error, results) {
+            connection.release();
+            if (error) {
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid.'
+              });
+            } else {
+              if (results[0]) {
+                data = {...data, interessado: true};
+                res.status(200).json(data);
+              } else {
+                data = {...data, interessado: false};
+                res.status(200).json(data);
+              }
+            }
+          });  
         } else {
           res.status(404).send({
             type: 'Not found',
