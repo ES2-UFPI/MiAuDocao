@@ -97,13 +97,17 @@ exports.post = async (req, res, next) => {
     query.
   */
   const userIdExceedsLimit = user_id.length > 20;
-  const nameExceedsLimit = nome.length > 50;
-  const descriptionExceedsLimit = descricao.length > 300;
+  const nameExceedsLimit = nome.length == 0 || nome.length > 50;
+  const descriptionExceedsLimit = descricao.length == 0 || descricao.length > 300;
   const especieExceedsLimit = especie.length > 20;
+  const especieInvalida = especie != 'cachorro' && especie != 'gato' && especie != 'coelho';
   const animalSizeExceedsLimit = porte.length > 20;
+  const animalSizeInvalido = porte != 'pequeno' && porte != 'médio' && porte != 'grande';
   const sexIsValid = sexo.length > 20;
+  const sexInvalido = sexo != 'macho' && sexo != 'fêmea';
   const ageRangeIsValid = faixaEtaria.length > 20;
-  const addressExceedsLimit = endereco.length > 100;
+  const ageRangeInvalido = faixaEtaria != 'filhote' && faixaEtaria != 'jovem' && faixaEtaria != 'adulto' && faixaEtaria != 'idoso';
+  const addressExceedsLimit = endereco.length == 0 || endereco.length > 100;
   const latitudeAndLongitudeAreNumbers = (isNaN(latitude) || isNaN(longitude));
   const photoIsBase64 = isBase64(foto, { allowMime: true });
 
@@ -113,8 +117,8 @@ exports.post = async (req, res, next) => {
   // , !photoIsBase64);
 
   if (userIdExceedsLimit || nameExceedsLimit || descriptionExceedsLimit
-      || especieExceedsLimit|| animalSizeExceedsLimit || sexIsValid
-      || ageRangeIsValid || addressExceedsLimit
+      || especieExceedsLimit || especieInvalida || animalSizeExceedsLimit || animalSizeInvalido || sexIsValid
+      || sexInvalido || ageRangeIsValid || ageRangeInvalido || addressExceedsLimit
       || latitudeAndLongitudeAreNumbers || !photoIsBase64)
   {
     res.status(400).send({
@@ -173,7 +177,6 @@ exports.post = async (req, res, next) => {
           ], function (error) {
             connection.release();
             if (error) {
-              console.log(error)
               res.status(400).send({
                 type: 'Database error',
                 description: 'One or more values are invalid (creating animal).'
@@ -181,7 +184,8 @@ exports.post = async (req, res, next) => {
             } else {
               res.status(201).send({
                 type: 'Created',
-                description: 'Animal added successfully.'
+                description: 'Animal added successfully.',
+                id: id
               });
             }
           });

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -86,11 +87,18 @@ class _AnimalFormState extends State<AnimalForm> {
 
     // Pega a imagem e transforma para base64
     String mime = 'data:image/${_paths.first.extension};base64,';
-    File image = File(_paths.first.path);
-    List<int> imageBytes = await image.readAsBytes();
-    setState(() {
-      _foto = mime + base64Encode(imageBytes);
-    });
+
+    if (kIsWeb) {
+      setState(() {
+        _foto = mime + base64Encode(_paths.first.bytes);
+      });
+    } else {
+      File image = File(_paths.first.path);
+      List<int> imageBytes = await image.readAsBytes();
+      setState(() {
+        _foto = mime + base64Encode(imageBytes);
+      });
+    } 
   }
 
   _openSearchAddressModal(BuildContext context) {

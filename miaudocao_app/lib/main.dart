@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.amber,
           accentColor: Colors.amberAccent,
           fontFamily: 'WorkSans'),
+      debugShowCheckedModeBanner: false,
       routes: {
         //AppRoutes.HOME: (ctx) => TabsScreen(),
         AppRoutes.HOME: (ctx) => WelcomeLoginScreen(),
