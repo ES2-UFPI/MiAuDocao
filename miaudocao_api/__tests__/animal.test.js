@@ -215,53 +215,53 @@ describe('Animal POST', () => {
   });
 });
 
-describe('Animal GET', () => {
-  let userId;
-  let animalId;
-  // Cria um usuário e um animal pra este usuário antes dos testes
-  beforeAll(async () => {
-    const userRes = await request(app).post('/usuario')
-      .send({
-        'nome': 'Usuario',
-        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
-        'email': nanoid(20),
-        'telefone': '1234',
-        'password': '1234',
-        'pref_especie': 'gato',
-        'pref_porte': 'pequeno',
-        'pref_sexo': 'macho',
-        'pref_faixa_etaria': 'jovem',
-        'pref_raio_busca': 2
-      });
-    userId = userRes.body['id'];
+// describe('Animal GET', () => {
+//   let userId;
+//   let animalId;
+//   // Cria um usuário e um animal pra este usuário antes dos testes
+//   beforeAll(async () => {
+//     const userRes = await request(app).post('/usuario')
+//       .send({
+//         'nome': 'Usuario',
+//         'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+//         'email': nanoid(20),
+//         'telefone': '1234',
+//         'password': '1234',
+//         'pref_especie': 'gato',
+//         'pref_porte': 'pequeno',
+//         'pref_sexo': 'macho',
+//         'pref_faixa_etaria': 'jovem',
+//         'pref_raio_busca': 2
+//       });
+//     userId = userRes.body['id'];
 
-    const animalRes = await request(app).post('/animais')
-      .send({
-        'user_id': userId,
-        'nome': 'Animal',
-        'descricao': 'Um animal',
-        'especie': 'gato',
-        'porte': 'pequeno',
-        'sexo': 'macho',
-        'faixa_etaria': 'jovem',
-        'endereco': 'rua x',
-        'latitude': '10',
-        'longitude': '10',
-        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
-      });
-    animalId = animalRes.body['id'];
-  });
+//     const animalRes = await request(app).post('/animais')
+//       .send({
+//         'user_id': userId,
+//         'nome': 'Animal',
+//         'descricao': 'Um animal',
+//         'especie': 'gato',
+//         'porte': 'pequeno',
+//         'sexo': 'macho',
+//         'faixa_etaria': 'jovem',
+//         'endereco': 'rua x',
+//         'latitude': '10',
+//         'longitude': '10',
+//         'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
+//       });
+//     animalId = animalRes.body['id'];
+//   });
 
-  it('deve requisitar um animal com sucesso', async () => {
-    const res = await request(app).get(`/animais?id=${animalId}`);
-    expect(res.status).toBe(200);
-  });
+//   it('deve requisitar um animal com sucesso', async () => {
+//     const res = await request(app).get(`/animais?id=${animalId}`);
+//     expect(res.status).toBe(200);
+//   });
 
-  it('deve falhar ao requisitar um animal pois o animal não existe', async () => {
-    const res = await request(app).get(`/animais?id=id_aqui`);
-    expect(res.status).toBe(404);
-  });
-});
+//   it('deve falhar ao requisitar um animal pois o animal não existe', async () => {
+//     const res = await request(app).get(`/animais?id=id_aqui`);
+//     expect(res.status).toBe(404);
+//   });
+// });
 
 describe('Animal GET (interessados)', () => {
   let userId;
