@@ -94,19 +94,24 @@ exports.post = async (req, res, next) => {
   const pref_faixa_etaria = req.body.pref_faixa_etaria;
   const pref_raio_busca = req.body.pref_raio_busca;
 
-  const nameExceedsLimit = nome == undefined || nome.length > 50;
+  const nameExceedsLimit = nome == undefined || nome.length == 0 || nome.length > 50;
   const photoIsBase64 = isBase64(foto, { allowMime: true });
-  const emailExceedsLimit = email == undefined || email.length > 100;
-  const telefoneExceedsLimit = telefone == undefined || telefone.length > 11;
+  const emailExceedsLimit = email == undefined || email.length == 0 || email.length > 100;
+  const telefoneExceedsLimit = telefone == undefined || telefone.length == 0 || telefone.length > 11;
   const especieExceedsLimit = pref_especie == undefined || pref_especie.length > 20;
+  const especieInvalida = pref_especie != 'cachorro' && pref_especie != 'gato' && pref_especie != 'coelho';
   const animalSizeExceedsLimit = pref_porte == undefined || pref_porte.length > 20;
+  const animalSizeInvalido = pref_porte != 'pequeno' && pref_porte != 'médio' && pref_porte != 'grande';
   const sexIsValid = pref_sexo == undefined || pref_sexo.length > 20;
+  const sexInvalido = pref_sexo != 'macho' && pref_sexo != 'fêmea';
   const ageRangeIsValid = pref_faixa_etaria == undefined || pref_faixa_etaria.length > 20;
+  const ageRangeInvalido = pref_faixa_etaria != 'filhote' && pref_faixa_etaria != 'jovem' && pref_faixa_etaria != 'adulto' && pref_faixa_etaria != 'idoso';
   const searchRadiusExceedsLimit = pref_raio_busca == undefined ||  pref_raio_busca < 1 || pref_raio_busca > 20;
 
   if (nameExceedsLimit || !photoIsBase64 || emailExceedsLimit
       || telefoneExceedsLimit || especieExceedsLimit || animalSizeExceedsLimit
-      || sexIsValid || ageRangeIsValid || searchRadiusExceedsLimit)
+      || sexIsValid || ageRangeIsValid || searchRadiusExceedsLimit
+      || especieInvalida || animalSizeInvalido || sexInvalido || ageRangeInvalido)
   {
     res.status(400).send({
       type: 'Request error',
