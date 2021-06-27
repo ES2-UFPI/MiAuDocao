@@ -1,7 +1,7 @@
 const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
-    let query = 'SELECT * FROM animal ';
+    let query = 'SELECT * FROM animal WHERE adotado = 0';
     let geoQuery = '';
     let first = false;
     let dados = [];
