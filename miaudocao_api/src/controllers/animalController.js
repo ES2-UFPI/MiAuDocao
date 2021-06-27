@@ -111,8 +111,6 @@ exports.post = async (req, res, next) => {
   const latitudeAndLongitudeAreNumbers = (isNaN(latitude) || isNaN(longitude));
   const photoIsBase64 = isBase64(foto, { allowMime: true });
 
-  console.log(especieInvalida);
-
   // console.log(nameExceedsLimit, descriptionExceedsLimit, especieExceedsLimit
   // , animalSizeExceedsLimit, sexIsValid, ageRangeIsValid
   // , addressExceedsLimit, latitudeAndLongitudeAreNumbers
