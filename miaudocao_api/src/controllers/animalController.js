@@ -97,8 +97,8 @@ exports.post = async (req, res, next) => {
     query.
   */
   const userIdExceedsLimit = user_id.length > 20;
-  const nameExceedsLimit = nome.length > 50;
-  const descriptionExceedsLimit = descricao.length > 300;
+  const nameExceedsLimit = nome.length == 0 || nome.length > 50;
+  const descriptionExceedsLimit = descricao.length == 0 || descricao.length > 300;
   const especieExceedsLimit = especie.length > 20;
   const animalSizeExceedsLimit = porte.length > 20;
   const sexIsValid = sexo.length > 20;
