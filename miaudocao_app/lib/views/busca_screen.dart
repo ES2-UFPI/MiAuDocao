@@ -195,6 +195,7 @@ class _BuscaScreenState extends State<BuscaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Busca'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
