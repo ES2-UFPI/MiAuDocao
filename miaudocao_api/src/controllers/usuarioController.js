@@ -168,7 +168,8 @@ exports.post = async (req, res, next) => {
             } else {
               res.status(201).send({
                 type: 'Created',
-                description: 'User created successfully.'
+                description: 'User created successfully.',
+                id: id
               });
             }
           });

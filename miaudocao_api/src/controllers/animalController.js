@@ -181,7 +181,8 @@ exports.post = async (req, res, next) => {
             } else {
               res.status(201).send({
                 type: 'Created',
-                description: 'Animal added successfully.'
+                description: 'Animal added successfully.',
+                id: id
               });
             }
           });
