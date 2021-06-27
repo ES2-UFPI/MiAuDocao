@@ -100,12 +100,18 @@ exports.post = async (req, res, next) => {
   const nameExceedsLimit = nome.length == 0 || nome.length > 50;
   const descriptionExceedsLimit = descricao.length == 0 || descricao.length > 300;
   const especieExceedsLimit = especie.length > 20;
+  const especieInvalida = especie != 'cachorro' && especie != 'gato' && especie != 'coelho';
   const animalSizeExceedsLimit = porte.length > 20;
+  const animalSizeInvalido = porte != 'pequeno' && porte != 'médio' && porte != 'grande';
   const sexIsValid = sexo.length > 20;
+  const sexInvalido = sexo != 'macho' && sexo != 'fêmea';
   const ageRangeIsValid = faixaEtaria.length > 20;
+  const ageRangeInvalido = faixaEtaria != 'filhote' && faixaEtaria != 'jovem' && faixaEtaria != 'adulto' && faixaEtaria != 'idoso';
   const addressExceedsLimit = endereco.length == 0 || endereco.length > 100;
   const latitudeAndLongitudeAreNumbers = (isNaN(latitude) || isNaN(longitude));
   const photoIsBase64 = isBase64(foto, { allowMime: true });
+
+  console.log(especieInvalida);
 
   // console.log(nameExceedsLimit, descriptionExceedsLimit, especieExceedsLimit
   // , animalSizeExceedsLimit, sexIsValid, ageRangeIsValid
@@ -113,8 +119,8 @@ exports.post = async (req, res, next) => {
   // , !photoIsBase64);
 
   if (userIdExceedsLimit || nameExceedsLimit || descriptionExceedsLimit
-      || especieExceedsLimit|| animalSizeExceedsLimit || sexIsValid
-      || ageRangeIsValid || addressExceedsLimit
+      || especieExceedsLimit || especieInvalida || animalSizeExceedsLimit || animalSizeInvalido || sexIsValid
+      || sexInvalido || ageRangeIsValid || ageRangeInvalido || addressExceedsLimit
       || latitudeAndLongitudeAreNumbers || !photoIsBase64)
   {
     res.status(400).send({
