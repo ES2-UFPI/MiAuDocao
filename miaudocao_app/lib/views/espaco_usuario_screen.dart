@@ -83,7 +83,12 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
     return LoaderOverlay(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Meu espaço'),
+          title: Text(
+            'Meu espaço',
+            style: TextStyle(
+              fontWeight: FontWeight.w700
+            ),
+          ),
           automaticallyImplyLeading: false,
           actions: [
             IconButton(

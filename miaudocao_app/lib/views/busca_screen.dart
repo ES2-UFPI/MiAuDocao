@@ -194,7 +194,12 @@ class _BuscaScreenState extends State<BuscaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Busca'),
+        title: Text(
+          'Busca',
+          style: TextStyle(
+            fontWeight: FontWeight.w700
+          ),
+        ),
         automaticallyImplyLeading: false,
       ),
       body: Column(
