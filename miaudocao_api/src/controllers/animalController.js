@@ -103,7 +103,7 @@ exports.post = async (req, res, next) => {
   const animalSizeExceedsLimit = porte.length > 20;
   const sexIsValid = sexo.length > 20;
   const ageRangeIsValid = faixaEtaria.length > 20;
-  const addressExceedsLimit = endereco.length > 100;
+  const addressExceedsLimit = endereco.length == 0 || endereco.length > 100;
   const latitudeAndLongitudeAreNumbers = (isNaN(latitude) || isNaN(longitude));
   const photoIsBase64 = isBase64(foto, { allowMime: true });
 
