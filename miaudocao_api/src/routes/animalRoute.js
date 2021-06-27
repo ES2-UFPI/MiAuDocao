@@ -3,6 +3,8 @@ const router = express.Router();
 const controller = require('../controllers/animalController');
 
 router.post('/', controller.post);
-router.get('/:id', controller.get);
+router.get('/', controller.get);
+router.get('/interessados/', controller.getInteressados);
+router.put('/marcar_adotado/', controller.marcarAdotado);
 
 module.exports = router;

@@ -1,14 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/usuario.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/animal_item.dart';
 import 'package:miaudocao_app/widgets/centralized_tip_text.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class BuscaScreen extends StatefulWidget {
-
+  final String connectedUserId;
+  BuscaScreen({@required this.connectedUserId});
   @override
   _BuscaScreenState createState() => _BuscaScreenState();
 }
@@ -30,16 +34,46 @@ class _BuscaScreenState extends State<BuscaScreen> {
   bool _isLoading = false;
 
   Future _animais;
+  Usuario _usuario;
 
-  void _updateSearch(String especie, String porte, String sexo, String faixaEtaria, String ordenacao, double raio) async {
+  void _getUserDetails(String id) async {
+    try {
+      await this
+          ._dio
+          .get('${Configs.API_URL}/usuario?email=${id}')
+          .then((response) {
+        setState(() {
+          _usuario = Usuario.fromJson(response.data);
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  void _updateSearch(String especie, String porte, String sexo,
+      String faixaEtaria, String ordenacao, double raio) async {
     setState(() {
       _showTip = false;
     });
 
-    if (especie == 'Todas') _especie = ''; else _especie = especie;
-    if (porte == 'Todos') _porte = ''; else _porte = porte;
-    if (sexo == 'Ambos') _sexo = ''; else _sexo = sexo;
-    if (faixaEtaria == 'Todas') _faixaEtaria = ''; else _faixaEtaria = faixaEtaria;
+    if (especie == 'Todas')
+      _especie = '';
+    else
+      _especie = especie;
+    if (porte == 'Todos')
+      _porte = '';
+    else
+      _porte = porte;
+    if (sexo == 'Ambos')
+      _sexo = '';
+    else
+      _sexo = sexo;
+    if (faixaEtaria == 'Todas')
+      _faixaEtaria = '';
+    else
+      _faixaEtaria = faixaEtaria;
     _ordenacao = ordenacao;
     _raio = raio;
 
@@ -49,37 +83,34 @@ class _BuscaScreenState extends State<BuscaScreen> {
       _animais = null;
       _animais = _fetchSearch();
     });
-    
   }
 
   Future _fetchSearch() async {
     setState(() => _isLoading = true);
     try {
-      final response = await this._dio.get(
-        'https://miaudocao.herokuapp.com/busca',
-        queryParameters: {
-          'especie': _especie,
-          'porte': _porte,
-          'sexo': _sexo,
-          'faixa': _faixaEtaria,
-          'lat': _currentLocation.latitude.toString(),
-          'lng': _currentLocation.longitude.toString(),
-          'raio': _raio
-        }
-      );
-      final List<Animal> animais = (response.data as List)
-          .map((item) => Animal.fromJson(item)).toList();
+      final response =
+          await this._dio.get('${Configs.API_URL}/busca', queryParameters: {
+        'especie': _especie,
+        'porte': _porte,
+        'sexo': _sexo,
+        'faixa': _faixaEtaria,
+        'lat': _currentLocation.latitude.toString(),
+        'lng': _currentLocation.longitude.toString(),
+        'raio': _raio
+      });
+      final List<Animal> animais =
+          (response.data as List).map((item) => Animal.fromJson(item)).toList();
 
       if (_ordenacao == 'Data mais recente') {
-        animais.sort((a,b) => b.data.compareTo(a.data));
+        animais.sort((a, b) => b.data.compareTo(a.data));
       } else if (_ordenacao == 'Data mais antiga') {
-        animais.sort((a,b) => a.data.compareTo(b.data));
+        animais.sort((a, b) => a.data.compareTo(b.data));
       } else if (_ordenacao == 'Mais próximo') {
         print('MAIS PRÓXIMO');
-        animais.sort((a,b) => a.distancia.compareTo(b.distancia));
+        animais.sort((a, b) => a.distancia.compareTo(b.distancia));
       } else if (_ordenacao == 'Mais distante') {
         print('MAIS DISTANTE');
-        animais.sort((a,b) => b.distancia.compareTo(a.distancia));
+        animais.sort((a, b) => b.distancia.compareTo(a.distancia));
       }
 
       setState(() => _isLoading = false);
@@ -100,11 +131,17 @@ class _BuscaScreenState extends State<BuscaScreen> {
     if (_currentLocation == null) {
       return;
     }
-   
-    setState(() {
-       _animais = _fetchSearch();
+
+    setState(() async {
+      await _getUserDetails(widget.connectedUserId);
+      _especie = toBeginningOfSentenceCase(_usuario.prefEspecie);
+      _porte = toBeginningOfSentenceCase(_usuario.prefPorte);
+      _sexo = toBeginningOfSentenceCase(_usuario.prefSexo);
+      _faixaEtaria = toBeginningOfSentenceCase(_usuario.prefFaixaEtaria);
+      _raio = _usuario.prefRaioBusca.toDouble();
+      _animais = _fetchSearch();
       _isLoading = false;
-    });   
+    });
     print("CurrentLocation: $_currentLocation");
   }
 
@@ -127,26 +164,24 @@ class _BuscaScreenState extends State<BuscaScreen> {
 
   void _openFiltersModal(BuildContext context) {
     showMaterialModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(20),
-          topRight: const Radius.circular(20)
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(20),
+              topRight: const Radius.circular(20)),
         ),
-      ),
-      builder: (_) {
-        return SearchFiltersModal(
-          onSubmitList: _updateSearch,
-          especie: _especie,
-          porte: _porte,
-          sexo: _sexo,
-          faixaEtaria: _faixaEtaria,
-          raio: _raio,
-          showOrdernar: true,
-          ordenacao: _ordenacao,
-        );
-      }
-    );
+        builder: (_) {
+          return SearchFiltersModal(
+            onSubmitList: _updateSearch,
+            especie: _especie,
+            porte: _porte,
+            sexo: _sexo,
+            faixaEtaria: _faixaEtaria,
+            raio: _raio,
+            showOrdernar: true,
+            ordenacao: _ordenacao,
+          );
+        });
   }
 
   @override
@@ -159,17 +194,25 @@ class _BuscaScreenState extends State<BuscaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Busca'),
+        title: Text(
+          'Busca',
+          style: TextStyle(
+            fontWeight: FontWeight.w700
+          ),
+        ),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
-          if (_showTip) Padding(
-            padding: const EdgeInsets.all(16),
-            child: CentralizedTipText(
-              title: 'Exibindo animais nas suas redondezas',
-              subtitle: 'Você pode aplicar filtros para refinar sua busca.',
+          if (_showTip)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: CentralizedTipText(
+                title: 'Exibindo animais de acordo com suas preferências',
+                subtitle:
+                    'Você pode aplicar filtros para refinar sua busca ou alterar suas preferências no seu perfil.',
+              ),
             ),
-          ),
           Expanded(
             child: FutureBuilder(
               builder: (context, snapshot) {
@@ -185,7 +228,9 @@ class _BuscaScreenState extends State<BuscaScreen> {
                           Icons.warning,
                           color: Theme.of(context).primaryColor,
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(
+                          height: 10,
+                        ),
                         Text(
                           'Parece que não há nenhum resultado com os filtros atuais. Tente filtrar a busca.',
                           textAlign: TextAlign.center,
@@ -198,11 +243,12 @@ class _BuscaScreenState extends State<BuscaScreen> {
                   itemCount: snapshot.data.length,
                   itemBuilder: (context, index) {
                     return AnimalItem(
-                      image: snapshot.data[index].foto,
-                      nome: snapshot.data[index].nome,
-                      descricao: snapshot.data[index].descricao,
-                      id: snapshot.data[index].id
-                    );
+                        image: snapshot.data[index].foto,
+                        nome: snapshot.data[index].nome,
+                        descricao: snapshot.data[index].descricao,
+                        id: snapshot.data[index].id,
+                        userId: _usuario.id,
+                        adotado: snapshot.data[index].adotado,);
                   },
                 );
               },
@@ -212,9 +258,8 @@ class _BuscaScreenState extends State<BuscaScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.filter_alt),
-        onPressed: () => _openFiltersModal(context)
-      ),
+          child: Icon(Icons.filter_alt),
+          onPressed: () => _openFiltersModal(context)),
     );
   }
 }

@@ -20,6 +20,7 @@ class CentralizedTipText extends StatelessWidget {
             fontSize: 16,
             fontWeight: FontWeight.bold
           ),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 5),
         Text(

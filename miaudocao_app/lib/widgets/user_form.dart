@@ -1,27 +1,41 @@
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import '../models/animal.dart';
-import '../utils/places_service.dart';
-import 'centralized_tip_text.dart';
-import 'input_button.dart';
-import 'custom_textfield.dart';
-import 'custom_dropdown_button.dart';
-import 'search_address_modal.dart';
+import 'package:miaudocao_app/models/usuario.dart';
+import 'package:miaudocao_app/widgets/custom_textfield.dart';
+import 'package:miaudocao_app/widgets/input_button.dart';
 
-class AnimalForm extends StatefulWidget {
-  final void Function(Animal, BuildContext) submitRegister;
-  AnimalForm(this.submitRegister);
+import 'centralized_tip_text.dart';
+import 'custom_dropdown_button.dart';
+
+class UserForm extends StatefulWidget {
+  final void Function(Usuario, BuildContext) submitRegister;
+  UserForm(this.submitRegister);
 
   @override
-  _AnimalFormState createState() => _AnimalFormState();
+  _UserFormState createState() => _UserFormState();
 }
 
-class _AnimalFormState extends State<AnimalForm> {  
+class _UserFormState extends State<UserForm> {
+  List<String> listaEspecies = ['Cachorro', 'Gato', 'Coelho'];
+  List<String> listaPortes = ['Pequeno', 'Médio', 'Grande'];
+  List<String> listaSexos = ['Macho', 'Fêmea'];
+  List<String> listaFaixasEtarias = ['Filhote', 'Jovem', 'Adulto', 'Idoso'];
+
+  final _nomeInputController = TextEditingController();
+  final _emailInputController = TextEditingController();
+  final _telefoneInputController = TextEditingController();
+  final _senhaInputController = TextEditingController();
+  String _especieSelecionada;
+  String _porteSelecionado;
+  String _sexoSelecionado;
+  String _faixaEtariaSelecionada;
+  double _currentSliderValue = 1;
+  String _foto;
 
   String _fileName;
   List<PlatformFile> _paths;
@@ -29,30 +43,6 @@ class _AnimalFormState extends State<AnimalForm> {
   bool _loadingPath = false;
   bool _multiPick = false;
   FileType _pickingType = FileType.image;
-
-  // TextField controllers
-  final _nomeInputController = TextEditingController();
-  final _descricaoInputController = TextEditingController();
-  String _endereco;
-  Coordinates _coordinates;
-  String _especieSelecionada;
-  String _porteSelecionado;
-  String _sexoSelecionado;
-  String _faixaEtariaSelecionada;
-  String _foto;
-  
-  List<String> listaEspecies = [
-    'Cachorro', 'Gato', 'Coelho'
-  ];
-  List<String> listaPortes = [
-    'Pequeno', 'Médio', 'Grande'
-  ];
-  List<String> listaSexos = [
-    'Macho', 'Fêmea'
-  ];
-  List<String> listaFaixasEtarias= [
-    'Filhote', 'Jovem', 'Adulto', 'Idoso'
-  ];
 
   void _openFileExplorer() async {
     FocusManager.instance.primaryFocus.unfocus();
@@ -101,31 +91,6 @@ class _AnimalFormState extends State<AnimalForm> {
     } 
   }
 
-  _openSearchAddressModal(BuildContext context) {
-    FocusManager.instance.primaryFocus.unfocus();
-    showBarModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(20),
-          topRight: const Radius.circular(20)
-        ),
-      ),
-      builder: (context) {
-        return SearchAddressModal(_setAddressAndCoordinates);
-      }
-    );
-  }
-
-  _setAddressAndCoordinates(String endereco, Coordinates coordinates) {
-    setState(() {
-      _endereco = endereco;
-      _coordinates = coordinates;
-    });
-
-    Navigator.of(context).pop();
-  }
-
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
     scaffold.showSnackBar(
@@ -137,31 +102,33 @@ class _AnimalFormState extends State<AnimalForm> {
 
   _submitForm(BuildContext context) {
     if (_nomeInputController.text.isEmpty
-      || _descricaoInputController.text.isEmpty || _foto == null
+      || _emailInputController.text.isEmpty
+      || _telefoneInputController.text.isEmpty 
+      || _senhaInputController.text.isEmpty || _foto == null
       || _especieSelecionada == null || _porteSelecionado == null
       || _sexoSelecionado == null || _faixaEtariaSelecionada == null
-      || _endereco == null || _coordinates == null
     ) {
       _showSnackBar(
         context,
-        'Opa! Parece que você não preecheu todas as informações.'
+        'Opa! Parece que você não preencheu todas as informações.'
       );
       return;
     }
 
-    Animal animal = Animal(
+    Usuario usuario = Usuario(
       nome: _nomeInputController.text,
-      descricao: _descricaoInputController.text,
       foto: _foto,
-      especie: _especieSelecionada.toLowerCase(),
-      porte: _porteSelecionado.toLowerCase(),
-      sexo: _sexoSelecionado.toLowerCase(),
-      faixaEtaria: _faixaEtariaSelecionada.toLowerCase(),
-      endereco: _endereco,
-      coordinates: _coordinates
+      email: _emailInputController.text,
+      telefone: _telefoneInputController.text,
+      password: _senhaInputController.text,
+      prefEspecie: _especieSelecionada.toLowerCase(),
+      prefPorte: _porteSelecionado.toLowerCase(),
+      prefSexo: _sexoSelecionado.toLowerCase(),
+      prefFaixaEtaria: _faixaEtariaSelecionada.toLowerCase(),
+      prefRaioBusca: _currentSliderValue.round()
     );
 
-    widget.submitRegister(animal, context);
+    widget.submitRegister(usuario, context);
   }
 
   @override
@@ -171,21 +138,13 @@ class _AnimalFormState extends State<AnimalForm> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Container(
-              height: 200,
-              child: Image.asset(
-                'assets/images/cat_dog.png',
-                fit: BoxFit.cover,
-              )
-            ),
-            SizedBox(height: 16),
             CentralizedTipText(
-              title: 'Identificação e informações do animal', 
-              subtitle: 'Estas são as informações básicas que ajudam a identificar o animal no MiAuDoção.'
+              title: 'Informações pessoais', 
+              subtitle: 'Estas são as informações que identificam você no MiAuDoção.'
             ),
             SizedBox(height: 10),
             CustomTextField(
-              hint: 'Nome do animal',
+              hint: 'Nome',
               maxLength: 50,
               controller: _nomeInputController,
               textCapitalization: TextCapitalization.words,
@@ -193,13 +152,26 @@ class _AnimalFormState extends State<AnimalForm> {
             ),
             SizedBox(height: 10),
             CustomTextField(
-              hint: 'Descrição do animal',
-              maxLength: 300,
-              showCounter: true,
-              multiline: true,
-              controller: _descricaoInputController,
-              textCapitalization: TextCapitalization.sentences,
-              keyboardType: TextInputType.text,
+              hint: 'E-mail',
+              maxLength: 100,
+              controller: _emailInputController,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 10),
+            CustomTextField(
+              hint: 'Telefone',
+              maxLength: 11,
+              controller: _telefoneInputController,
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 10),
+            CustomTextField(
+              hint: 'Senha',
+              maxLength: 100,
+              controller: _senhaInputController,
+              obscureText: true,
               textInputAction: TextInputAction.done,
             ),
             SizedBox(height: 10),
@@ -216,78 +188,80 @@ class _AnimalFormState extends State<AnimalForm> {
             ),
             SizedBox(height: 16),
             CentralizedTipText(
-              title: 'Alguns detalhes do animal', 
-              subtitle: 'Estes detalhes são para que o animal seja encontrado mais facilmente por um tutor interessado.'
+              title: 'Suas preferências', 
+              subtitle: 'Você poderá alterá-las depois se preferir.'
             ),
             SizedBox(height: 10),
             CustomDropdownButton(
-              hint: 'Espécie',
+              hint: 'Preferência de espécie',
               selectedItem: _especieSelecionada,
               itemsList: listaEspecies,
               onSelected: (newValue) {
                 setState(() {
-                  _especieSelecionada = newValue;        
+                  _especieSelecionada = newValue;
                 });
-              }
+              },
             ),
             SizedBox(height: 10),
             CustomDropdownButton(
-              hint: 'Porte',
+              hint: 'Preferência de porte',
               selectedItem: _porteSelecionado,
               itemsList: listaPortes,
               onSelected: (newValue) {
                 setState(() {
-                  _porteSelecionado = newValue;        
+                  _porteSelecionado = newValue;
                 });
-              }
+              },
             ),
             SizedBox(height: 10),
             CustomDropdownButton(
-              hint: 'Sexo',
+              hint: 'Preferência de sexo',
               selectedItem: _sexoSelecionado,
               itemsList: listaSexos,
               onSelected: (newValue) {
                 setState(() {
-                  _sexoSelecionado = newValue;        
+                  _sexoSelecionado = newValue;
                 });
-              }
+              },
             ),
             SizedBox(height: 10),
             CustomDropdownButton(
-              hint: 'Faixa etária',
+              hint: 'Preferência de faixa-etária',
               selectedItem: _faixaEtariaSelecionada,
               itemsList: listaFaixasEtarias,
               onSelected: (newValue) {
                 setState(() {
-                  _faixaEtariaSelecionada = newValue;        
+                  _faixaEtariaSelecionada = newValue;
                 });
-              }
-            ),
-            SizedBox(height: 16),
-            CentralizedTipText(
-              title: 'Localização', 
-              subtitle: 'Para facilitar ainda mais a adoção, pedimos que informe o endereço onde se encontra o animal.'
-            ),
-            SizedBox(height: 10), 
-            InputButton(
-              onTap: () => _openSearchAddressModal(context),
-              label: _endereco == null ? 'Procurar endereço' : _endereco,
-              icon: Icon(Icons.pin_drop),
+              },
             ),
             SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                //style: ElevatedButton.styleFrom(shape: StadiumBorder()),
-                onPressed: () => _submitForm(context),
-                child: Text(
-                  'Cadastrar animal',
-                  style: TextStyle(
-                    fontSize: 18
-                  ),
-                )
+            SliderTheme(
+              data: SliderThemeData(
+                valueIndicatorColor: Colors.grey.shade200,
               ),
-            )
+              child: Slider(
+                value: _currentSliderValue,
+                min: 1,
+                max: 20,
+                divisions: 20,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                  });
+                },
+              ),
+            ),
+            Text(
+              'Raio de busca preferido: ${_currentSliderValue.round()} km',
+              style: TextStyle(fontWeight: FontWeight.bold)
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _submitForm(context),
+              child: Text('Concluir cadastro'),
+            ),
           ],
         ),
       ),

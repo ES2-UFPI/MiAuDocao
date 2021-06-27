@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/views/busca_screen.dart';
 import 'package:miaudocao_app/views/espaco_usuario_screen.dart';
 import 'package:miaudocao_app/views/explorar_screen.dart';
 
 class TabsScreen extends StatefulWidget {
+  final Usuario connectedUser;
+  TabsScreen(this.connectedUser);
+
   @override
   _TabsScreenState createState() => _TabsScreenState();
 }
@@ -16,24 +20,21 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
     _screens = [
-      {
-        'title': 'MiAuDoção',
-        'screen': ExplorarScreen()
-      },
+      {'title': 'MiAuDoção', 'screen': ExplorarScreen(connectedUserId: widget.connectedUser.id)},
       {
         'title': 'Busca',
-        'screen': BuscaScreen()
+        'screen': BuscaScreen(connectedUserId: widget.connectedUser.id)
       },
       {
         'title': 'Meu espaço',
-        'screen': EspacoUsuarioScreen()
+        'screen': EspacoUsuarioScreen(connectedUser: widget.connectedUser)
       }
     ];
   }
 
   _selectScreen(int index) {
     setState(() {
-    _selectedScreenIndex = index;
+      _selectedScreenIndex = index;
     });
   }
 
@@ -47,18 +48,10 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectedScreenIndex,
         onTap: _selectScreen,
         items: [
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Explorar'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Busca'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pets),
-            label: 'Explorar'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Busca'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Meu espaço'
-          )
+              icon: Icon(Icons.list_alt), label: 'Meu espaço')
         ],
       ),
     );

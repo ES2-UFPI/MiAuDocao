@@ -8,10 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:miaudocao_app/models/animal.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
+import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ExplorarScreen extends StatefulWidget {
+  final String connectedUserId;
+  ExplorarScreen({this.connectedUserId});
+
   @override
   _ExplorarScreenState createState() => _ExplorarScreenState();
 }
@@ -50,7 +54,7 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
           onTap: () => 
               Navigator.of(context).pushNamed(          
                 AppRoutes.VISUALIZAR_ANIMAL,
-                arguments: id
+                arguments: [id, widget.connectedUserId]
               ),
           consumeTapEvents: true
         )
@@ -108,7 +112,7 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
   Future<void> _fetchSearch() async {
     try {
       final response = await this._dio.get(
-        'https://miaudocao.herokuapp.com/busca',
+        '${Configs.API_URL}/busca',
         queryParameters: {
           'especie': _especie,
           'porte': _porte,

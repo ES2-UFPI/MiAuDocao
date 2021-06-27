@@ -4,7 +4,8 @@ const isBase64 = require('is-base64');
 const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
-  const id = req.params.id;
+  const id = req.query.id;
+  const user = req.query.user;
   pool.getConnection((err, connection) => {
     if (err) {
       res.status(500).send({
@@ -15,8 +16,8 @@ exports.get = async (req, res, next) => {
     connection.query(`SELECT * FROM animal WHERE id = ?`, [
       id
     ], function (error, results) {
-      connection.release();
       if (error) {
+        connection.release();
         res.status(400).send({
           type: 'Database error',
           description: 'One or more values are invalid.'
@@ -25,6 +26,7 @@ exports.get = async (req, res, next) => {
         if (results[0]) {
           let data = {
             id: results[0].id,
+            user_id: results[0].user_id,
             nome: results[0].nome,
             descricao: results[0].descricao,
             especie: results[0].especie,
@@ -37,7 +39,26 @@ exports.get = async (req, res, next) => {
             data_cadastro: results[0].data_cadastro,
             foto: results[0].foto.toString()
           }
-          res.status(200).json(data);
+          connection.query(`SELECT * FROM interesse_animal WHERE user_id = ? AND animal_id = ?`, [
+            user,
+            id
+          ], function(error, results) {
+            connection.release();
+            if (error) {
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid.'
+              });
+            } else {
+              if (results[0]) {
+                data = {...data, interessado: true};
+                res.status(200).json(data);
+              } else {
+                data = {...data, interessado: false};
+                res.status(200).json(data);
+              }
+            }
+          });  
         } else {
           res.status(404).send({
             type: 'Not found',
@@ -52,6 +73,7 @@ exports.get = async (req, res, next) => {
 
 exports.post = async (req, res, next) => {
   const id = nanoid(20); // OK
+  const user_id = req.body.user_id;
   const nome = req.body.nome;
   const descricao = req.body.descricao;
   const especie = req.body.especie;
@@ -74,13 +96,18 @@ exports.post = async (req, res, next) => {
     por tamanho para evitar que valores grandes passem para a fase de enviar a
     query.
   */
-  const nameExceedsLimit = nome.length > 50;
-  const descriptionExceedsLimit = descricao.length > 300;
+  const userIdExceedsLimit = user_id.length > 20;
+  const nameExceedsLimit = nome.length == 0 || nome.length > 50;
+  const descriptionExceedsLimit = descricao.length == 0 || descricao.length > 300;
   const especieExceedsLimit = especie.length > 20;
+  const especieInvalida = especie != 'cachorro' && especie != 'gato' && especie != 'coelho';
   const animalSizeExceedsLimit = porte.length > 20;
+  const animalSizeInvalido = porte != 'pequeno' && porte != 'médio' && porte != 'grande';
   const sexIsValid = sexo.length > 20;
+  const sexInvalido = sexo != 'macho' && sexo != 'fêmea';
   const ageRangeIsValid = faixaEtaria.length > 20;
-  const addressExceedsLimit = endereco.length > 100;
+  const ageRangeInvalido = faixaEtaria != 'filhote' && faixaEtaria != 'jovem' && faixaEtaria != 'adulto' && faixaEtaria != 'idoso';
+  const addressExceedsLimit = endereco.length == 0 || endereco.length > 100;
   const latitudeAndLongitudeAreNumbers = (isNaN(latitude) || isNaN(longitude));
   const photoIsBase64 = isBase64(foto, { allowMime: true });
 
@@ -89,10 +116,10 @@ exports.post = async (req, res, next) => {
   // , addressExceedsLimit, latitudeAndLongitudeAreNumbers
   // , !photoIsBase64);
 
-  if (nameExceedsLimit || descriptionExceedsLimit || especieExceedsLimit
-      || animalSizeExceedsLimit || sexIsValid || ageRangeIsValid
-      || addressExceedsLimit || latitudeAndLongitudeAreNumbers
-      || !photoIsBase64)
+  if (userIdExceedsLimit || nameExceedsLimit || descriptionExceedsLimit
+      || especieExceedsLimit || especieInvalida || animalSizeExceedsLimit || animalSizeInvalido || sexIsValid
+      || sexInvalido || ageRangeIsValid || ageRangeInvalido || addressExceedsLimit
+      || latitudeAndLongitudeAreNumbers || !photoIsBase64)
   {
     res.status(400).send({
       type: 'Request error',
@@ -120,32 +147,120 @@ exports.post = async (req, res, next) => {
         description: 'Something went wrong. Try again.'
       });
     }
-    connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-      id,
-      nome,
-      descricao,
-      especie,
-      porte,
-      sexo,
-      faixaEtaria,
-      endereco,
-      latitude,
-      longitude,
-      data_cadastro,
-      compressedImage
+
+    connection.query(`SELECT * FROM usuario WHERE id = ?`, [
+      user_id
+    ], function(error, results) {
+      if (error) {
+        connection.release();
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One or more values are invalid (validating user).'
+        });
+      } else {
+        if (results[0]) {
+          connection.query(`INSERT INTO animal VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            id,
+            user_id,
+            nome,
+            descricao,
+            especie,
+            porte,
+            sexo,
+            faixaEtaria,
+            endereco,
+            latitude,
+            longitude,
+            data_cadastro,
+            compressedImage,
+            0
+          ], function (error) {
+            connection.release();
+            if (error) {
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid (creating animal).'
+              });
+            } else {
+              res.status(201).send({
+                type: 'Created',
+                description: 'Animal added successfully.',
+                id: id
+              });
+            }
+          });
+        } else {
+          res.status(404).send({
+            type: 'Not found',
+            description: 'The user (that supposed to be the animal owner) was not found in database.'
+          });
+        }
+      }
+    });
+  });
+}
+
+exports.getInteressados = (req, res, next) => {
+  const id = req.query.id;
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+    
+    connection.query(`SELECT u.id, u.foto, u.nome
+      FROM usuario u
+        INNER JOIN interesse_animal i
+        ON u.id = i.user_id
+      WHERE animal_id = ?;`, [
+      id
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'The animal does not exist.'
+        });
+      } else {
+        results.forEach((element, index) => {
+          results[index].foto = element.foto.toString();
+        });
+        res.status(200).send(results);
+      }
+    })
+  });
+}
+
+exports.marcarAdotado = (req, res, next) => {
+  const id = req.query.id;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+    }
+
+    connection.query(`UPDATE animal SET adotado = ? WHERE id = ?`, [
+      1,
+      id
     ], function (error) {
       connection.release();
       if (error) {
         res.status(400).send({
           type: 'Database error',
-          description: 'One or more values are invalid.'
+          description: 'The animal does not exist.'
         });
       } else {
-        res.status(201).send({
-          type: 'Created',
-          description: 'Animal added successfully.'
+        res.status(200).send({
+          type: 'Updated',
+          description: 'The animal has been marked as adopted.'
         });
       }
-    });
-  });
+    })
+  })
+
 }
