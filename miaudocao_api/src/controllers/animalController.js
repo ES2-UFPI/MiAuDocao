@@ -173,7 +173,6 @@ exports.post = async (req, res, next) => {
           ], function (error) {
             connection.release();
             if (error) {
-              console.log(error)
               res.status(400).send({
                 type: 'Database error',
                 description: 'One or more values are invalid (creating animal).'
