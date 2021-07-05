@@ -1,7 +1,7 @@
 const pool = require('../configs/db');
 
 exports.get = async (req, res, next) => {
-    let query = 'SELECT * FROM animal WHERE adotado = 0';
+    let query = 'SELECT * FROM animal ';
     let geoQuery = '';
     let first = false;
     let dados = [];
@@ -29,6 +29,8 @@ exports.get = async (req, res, next) => {
         if (first == false) first = true;
         dados.push(req.query.faixa);
     }
+
+    query += !first ? 'WHERE adotado = 0 ' : 'AND adotado = 0 ';
 
     if (req.query.raio && req.query.lat && req.query.lng) {
         geoQuery = `
