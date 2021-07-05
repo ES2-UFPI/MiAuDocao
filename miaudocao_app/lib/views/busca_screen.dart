@@ -87,17 +87,23 @@ class _BuscaScreenState extends State<BuscaScreen> {
 
   Future _fetchSearch() async {
     setState(() => _isLoading = true);
+
+    print(_especie + _porte + _sexo + _faixaEtaria + _currentLocation.latitude.toString() + _currentLocation.longitude.toString() + _raio.toString());
+
     try {
       final response =
           await this._dio.get('${Configs.API_URL}/busca', queryParameters: {
-        'especie': _especie,
-        'porte': _porte,
-        'sexo': _sexo,
-        'faixa': _faixaEtaria,
+        'especie': _especie.toLowerCase(),
+        'porte': _porte.toLowerCase(),
+        'sexo': _sexo.toLowerCase(),
+        'faixa': _faixaEtaria.toLowerCase(),
         'lat': _currentLocation.latitude.toString(),
         'lng': _currentLocation.longitude.toString(),
         'raio': _raio
       });
+
+      print(response.data);
+      print(response.statusCode);
       final List<Animal> animais =
           (response.data as List).map((item) => Animal.fromJson(item)).toList();
 
