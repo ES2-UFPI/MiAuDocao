@@ -49,3 +49,12 @@ CREATE TABLE notificacao (
     tipo ENUM('animal', 'pergunta') NOT NULL,
     id_tipo VARCHAR(20) NOT NULL
 );
+
+CREATE TABLE pergunta (
+	id VARCHAR(20) NOT NULL,
+    id_autor VARCHAR(20) NOT NULL,
+    id_animal VARCHAR(20) NOT NULL,
+    pergunta VARCHAR(200),
+    resposta VARCHAR(200),
+    data_cadastro long
+);
