@@ -165,6 +165,56 @@ exports.get = async (req, res, next) => {
 }
 
 exports.put = async (req, res, next) => {
-  res.status(200).json({ mensagem: 'responder pergunta' })
+  const animalId = req.params.id;
+  const perguntaId = req.params.id_pergunta;
+  const resposta = req.body.resposta;
+
+  const animalIdIsInvalid = animalId == undefined || animalId.length != 20;
+  const perguntaIsInvalid = perguntaId == undefined || perguntaId.length != 20;
+  const respostaIsInvalid = resposta == undefined || resposta.length == 0 || resposta.length > 200;
+
+  if (animalIdIsInvalid || perguntaIsInvalid || respostaIsInvalid) {
+    res.status(400).send({
+      type: 'Request error',
+      description: "One or more parameters are invalid."
+    });
+
+    return;
+  }
   
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+
+      return;
+    }
+
+    connection.query(`UPDATE pergunta SET resposta = ? WHERE id_animal = ? AND id = ?`, [
+      resposta,
+      animalId,
+      perguntaId
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        console.log(error);
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One or more values are invalid.'
+        });
+      } else if (results.affectedRows == 1){
+        res.status(200).send({
+          type: 'Answered',
+          description: 'The question was answered successfully.'
+        });
+      } else {
+        res.status(400).send({
+          type: 'Not answered',
+          description: 'Something went wrong. Verify if the animal id or question id and try again.'
+        });
+      }
+    });
+  }); 
 }
