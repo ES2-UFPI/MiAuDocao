@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/animalController');
-const controller = require('../controllers/animalController');
+const perguntaController = require('../controllers/perguntaController');
 
 router.post('/', controller.post);
 router.get('/', controller.get);
