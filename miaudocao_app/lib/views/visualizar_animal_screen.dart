@@ -126,7 +126,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
   _openQuestionsScreen(BuildContext context) {
     Navigator.of(context).pushNamed(
       AppRoutes.PERGUNTAS,
-      arguments: [widget._animalAndUserId[0], widget._animalAndUserId[1]]);
+      arguments: [widget._animalAndUserId[0], widget._animalAndUserId[1], 'visualizar']);
   }
 
   _getFloatingActionButton(String animalUser, bool interesseManifestado, bool interessado) {
