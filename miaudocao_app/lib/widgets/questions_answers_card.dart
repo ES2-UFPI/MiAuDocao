@@ -3,7 +3,8 @@ import 'package:miaudocao_app/models/pergunta.dart';
 
 class QuestionAnswersCard extends StatelessWidget {
   final List<dynamic> _perguntas;
-  QuestionAnswersCard(this._perguntas);
+  final Function() onTap;
+  QuestionAnswersCard(this._perguntas, this.onTap);
 
   Pergunta _getMostRecentQuestion() {
     _perguntas.sort((a, b) => b.dataCadastro.compareTo(a.dataCadastro));
@@ -73,7 +74,7 @@ class QuestionAnswersCard extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => {},
+                onTap: onTap,
                 child: Text(
                   'Ver todas as perguntas',
                   style: TextStyle(
