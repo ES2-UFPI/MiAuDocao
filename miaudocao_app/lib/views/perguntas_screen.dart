@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:loader_overlay/loader_overlay.dart';
 import 'package:miaudocao_app/models/pergunta.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/custom_textfield.dart';
