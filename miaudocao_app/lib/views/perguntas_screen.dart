@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:miaudocao_app/models/pergunta.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/custom_textfield.dart';
 
 class PerguntasScreen extends StatefulWidget {
-  final String animalId;
-  PerguntasScreen(this.animalId);
+  final List<String> arguments;
+  PerguntasScreen(this.arguments);
 
   @override
   _PerguntasScreenState createState() => _PerguntasScreenState();
@@ -16,13 +19,15 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
   final Dio _dio = Dio();
   Future<List<Pergunta>> _perguntas;
   bool _isLoading = false;
+  bool _isSending = false;
+  TextEditingController _perguntaController = new TextEditingController();
 
   Future<List<Pergunta>> _fetchPerguntas() async {
     setState(() => _isLoading = true);
     try {
       final response = await this
           ._dio
-          .get('${Configs.API_URL}/animais/${widget.animalId}/pergunta/all');
+          .get('${Configs.API_URL}/animais/${widget.arguments[0]}/pergunta/all');
       
       final List<Pergunta> perguntas =
           (response.data as List).map((item) => Pergunta.fromJson(item)).toList();
@@ -34,6 +39,26 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
     }
 
     return null;
+  }
+
+  void _sendQuestion(BuildContext context) async {
+    FocusScope.of(context).unfocus();
+    setState(() => _isSending = true);
+    try {
+      await this._dio.post('${Configs.API_URL}/animais/${widget.arguments[0]}/pergunta',
+        data: json.encode({
+          'autor_id': widget.arguments[1],
+          'pergunta': _perguntaController.text
+        })
+      );
+      setState(() {
+        _perguntas = _fetchPerguntas();
+        _perguntaController.clear();
+        _isSending = false;
+      });
+    } on DioError catch (e) {
+      print(e.response);
+    }
   }
 
   @override
@@ -64,14 +89,14 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.notifications_off_outlined,
+                            Icons.warning,
                             color: Theme.of(context).primaryColor,
                           ),
                           SizedBox(
                             height: 10,
                           ),
                           Text(
-                            'Sem notificações',
+                            'Sem perguntas',
                             textAlign: TextAlign.center,
                           )
                         ],
@@ -127,30 +152,44 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
               future: _perguntas,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    hint: 'Escreva sua pergunta',
-                    maxLength: 200,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).accentColor,
-                    shape: BoxShape.circle
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () => {},
-                  ),
+          _isSending
+            ? Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 10),
+                    Text('Enviando...'),
+                  ],
                 )
-              ],
-            ),
-          )
+              )
+            : Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        hint: 'Escreva sua pergunta',
+                        maxLength: 200,
+                        controller: _perguntaController,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).accentColor,
+                        shape: BoxShape.circle
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () => _sendQuestion(context),
+                      ),
+                    )
+                  ],
+                ),
+              )
         ],
       ),
     );
