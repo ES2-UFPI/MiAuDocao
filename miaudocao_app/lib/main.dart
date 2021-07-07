@@ -72,10 +72,10 @@ class MyApp extends StatelessWidget {
         }
 
         if (settings.name == AppRoutes.PERGUNTAS) {
-          final String argument = settings.arguments;
+          final List<String> arguments = settings.arguments;
 
           return MaterialPageRoute(builder: (context) {
-            return PerguntasScreen(argument);
+            return PerguntasScreen(arguments);
           });
         }
 
