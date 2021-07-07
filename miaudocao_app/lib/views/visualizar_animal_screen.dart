@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:measurer/measurer.dart';
 import 'package:miaudocao_app/models/animal.dart';
-import 'package:miaudocao_app/models/pergunta.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/utils/places_service.dart';
 import 'package:miaudocao_app/widgets/address_details_modal.dart';
@@ -13,7 +12,6 @@ import 'package:miaudocao_app/widgets/address_info_card.dart';
 import 'package:miaudocao_app/widgets/animal_identification.dart';
 import 'package:miaudocao_app/widgets/animal_info_card.dart';
 import 'package:miaudocao_app/widgets/fullscreen_image.dart';
-import 'package:miaudocao_app/widgets/questions_answers_card.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../models/animal.dart';
@@ -33,8 +31,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
 
   final Dio _dio = Dio();
   Future<Animal> _animal;
-  Future<List<Pergunta>> _perguntas;
-  
+
   Future<Animal> fetchAnimal() async {
     try {
       final response = await this
@@ -49,23 +46,6 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     } catch (e) {
       print(e);
     }
-    return null;
-  }
-
-  Future<List<Pergunta>> _fetchPerguntas() async {
-    try {
-      final response = await this
-          ._dio
-          .get('${Configs.API_URL}/animais/${widget._animalAndUserId[0]}/pergunta/all');
-      
-      final List<Pergunta> perguntas =
-          (response.data as List).map((item) => Pergunta.fromJson(item)).toList();
-
-      return perguntas;
-    } catch (e) {
-      print(e);
-    }
-
     return null;
   }
 
@@ -104,7 +84,6 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     super.initState();
 
     _animal = fetchAnimal();
-    _perguntas = _fetchPerguntas();
   }
 
   _openAddressDetailsModal(
@@ -232,16 +211,6 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
                                             sexo: snapshot.data.sexo,
                                             faixaEtaria:
                                                 snapshot.data.faixaEtaria),
-                                        SizedBox(height: 16),
-                                        FutureBuilder(
-                                          future: _perguntas,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData) {
-                                              return QuestionAnswersCard(snapshot.data); 
-                                            }
-                                            return CircularProgressIndicator();
-                                          }
-                                        ),
                                         SizedBox(height: 16),
                                         AddressInfoCard(
                                           endereco: snapshot.data.endereco,
