@@ -7,4 +7,5 @@ class AppRoutes {
   static const INTERESSADOS = '/interessados';
   static const PERFIL = '/perfil';
   static const NOTIFICACOES = '/notificacoes';
+  static const PERGUNTAS = '/perguntas';
 }
