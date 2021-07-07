@@ -33,6 +33,8 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
           (response.data as List).map((item) => Pergunta.fromJson(item)).toList();
       setState(() => _isLoading = false);
 
+      perguntas.sort((a, b) => b.dataCadastro.compareTo(a.dataCadastro));
+
       return perguntas;
     } catch (e) {
       print(e);
