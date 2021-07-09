@@ -20,6 +20,7 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
   bool _isLoading = false;
   bool _isSending = false;
   TextEditingController _perguntaController = new TextEditingController();
+  TextEditingController _respostaController = new TextEditingController();
 
   Future<List<Pergunta>> _fetchPerguntas() async {
     setState(() => _isLoading = true);
@@ -60,6 +61,90 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
     } on DioError catch (e) {
       print(e.response);
     }
+  }
+
+  void _sendAnswer(BuildContext context, String animalId, String perguntaId) async {
+    FocusScope.of(context).unfocus();
+    setState(() => _isSending = true);
+    try {
+      await this._dio.put('${Configs.API_URL}/animais/${animalId}/pergunta/${perguntaId}/responder',
+        data: json.encode({
+          'resposta': _respostaController.text
+        })
+      );
+      Navigator.of(context).pop();
+      setState(() {
+        _perguntas = _fetchPerguntas();
+        _respostaController.clear();
+        _isSending = false;
+      });
+    } on DioError catch (e) {
+      print(e.response);
+    }
+  }
+
+  void _openAnswerModal(BuildContext context, String pergunta, String animalId, String perguntaId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(20),
+          topRight: const Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: _isSending
+            ? Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(width: 10),
+                  Text('Enviando...'),
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    child: Text(
+                      pergunta,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          hint: 'Digite sua resposta',
+                          maxLength: 200,
+                          controller: _respostaController,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).accentColor,
+                          shape: BoxShape.circle
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () => _sendAnswer(context, animalId, perguntaId),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )
+        );
+      }
+    );
   }
 
   @override
@@ -111,38 +196,50 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
                     return Card(
                       child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: Column(
+                        child: Row(
                           children: [
-                            Container(
-                              width: double.infinity,
-                              child: Text(
-                                snapshot.data[index].pergunta,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold
-                                ),
-                                textAlign: TextAlign.start,
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      snapshot.data[index].pergunta,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  snapshot.data[index].resposta == ''
+                                    ? Container(
+                                        width: double.infinity,
+                                        child: Text(
+                                          'Ainda sem resposta.',
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.grey.shade600
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                    )
+                                    : Container(
+                                        width: double.infinity,
+                                        child: Text(
+                                          snapshot.data[index].resposta,
+                                          textAlign: TextAlign.start,
+                                        ),
+                                    ),
+                                ],
                               ),
                             ),
-                            SizedBox(height: 5),
-                            snapshot.data[index].resposta == ''
-                              ? Container(
-                                  width: double.infinity,
-                                  child: Text(
-                                    'Ainda sem resposta.',
-                                    style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.grey.shade600
-                                    ),
-                                    textAlign: TextAlign.start,
-                                  ),
-                              )
-                              : Container(
-                                  width: double.infinity,
-                                  child: Text(
-                                    snapshot.data[index].resposta,
-                                    textAlign: TextAlign.start,
-                                  ),
-                              ),
+                            widget.arguments[2] == 'resposta' && snapshot.data[index].resposta == ''
+                              ? TextButton(
+                                  onPressed: () => _openAnswerModal(context, snapshot.data[index].pergunta, snapshot.data[index].idAnimal, snapshot.data[index].id),
+                                  child: Text('Responder')
+                                )
+                              : Container(),
                           ],
                         ),
                       )
@@ -153,44 +250,46 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
               future: _perguntas,
             ),
           ),
-          _isSending
-            ? Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(width: 10),
-                    Text('Enviando...'),
-                  ],
+          widget.arguments[2] == 'resposta'
+            ? Container()
+            : _isSending
+              ? Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(width: 10),
+                      Text('Enviando...'),
+                    ],
+                  )
                 )
-              )
-            : Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        hint: 'Escreva sua pergunta',
-                        maxLength: 200,
-                        controller: _perguntaController,
+              : Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          hint: 'Escreva sua pergunta',
+                          maxLength: 200,
+                          controller: _perguntaController,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor,
-                        shape: BoxShape.circle
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () => _sendQuestion(context),
-                      ),
-                    )
-                  ],
-                ),
-              )
+                      SizedBox(width: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).accentColor,
+                          shape: BoxShape.circle
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () => _sendQuestion(context),
+                        ),
+                      )
+                    ],
+                  ),
+                )
         ],
       ),
     );
