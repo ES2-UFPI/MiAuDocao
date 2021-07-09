@@ -13,6 +13,7 @@ class AnimalItem extends StatelessWidget {
   final bool showOptions;
   final Function showInteressados;
   final Function marcarAdotado;
+  final Function showQuestions;
 
   AnimalItem({
     @required this.image,
@@ -23,7 +24,8 @@ class AnimalItem extends StatelessWidget {
     @required this.adotado,
     this.showOptions = false,
     this.showInteressados,
-    this.marcarAdotado
+    this.marcarAdotado,
+    this.showQuestions
   });
 
   @override
@@ -86,14 +88,19 @@ class AnimalItem extends StatelessWidget {
                   showOptions && !adotado
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
                           TextButton(
                             onPressed: showInteressados,
-                            child: Text('Ver interessados')
+                            child: Text('Interessados')
+                          ),
+                          TextButton(
+                            onPressed: showQuestions,
+                            child: Text('Perguntas')
                           ),
                           TextButton(
                             onPressed: marcarAdotado,
-                            child: Text('Marcar como adotado')
+                            child: Text('Adotado', overflow: TextOverflow.ellipsis,)
                           )
                         ],
                       )

@@ -49,6 +49,12 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
     Navigator.of(context).pushNamed(AppRoutes.INTERESSADOS, arguments: animalId);
   }
 
+  void _onShowQuestions(BuildContext context, String animalId, String userId) {
+    Navigator.of(context).pushNamed(
+      AppRoutes.PERGUNTAS,
+      arguments: [animalId, userId, 'resposta']);
+  }
+
   void _marcarAdotado(String animalId, BuildContext context) async {
     context.loaderOverlay.show();
     try {
@@ -229,6 +235,7 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
                               adotado: snapshot.data[index].adotado,
                               showOptions: true,
                               showInteressados: () => _onShowInteressados(context, snapshot.data[index].id),
+                              showQuestions: () => _onShowQuestions(context, snapshot.data[index].id, widget.connectedUser.id),
                               marcarAdotado: () => _marcarAdotado(snapshot.data[index].id, context),
                             );
                           },
