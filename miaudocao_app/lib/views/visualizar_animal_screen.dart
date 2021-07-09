@@ -6,6 +6,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:measurer/measurer.dart';
 import 'package:miaudocao_app/models/animal.dart';
 import 'package:miaudocao_app/models/pergunta.dart';
+import 'package:miaudocao_app/utils/app_routes.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/utils/places_service.dart';
 import 'package:miaudocao_app/widgets/address_details_modal.dart';
@@ -120,6 +121,12 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
           return AddressDetailsModal(
               endereco: endereco, coordinates: coordinates);
         });
+  }
+
+  _openQuestionsScreen(BuildContext context) {
+    Navigator.of(context).pushNamed(
+      AppRoutes.PERGUNTAS,
+      arguments: [widget._animalAndUserId[0], widget._animalAndUserId[1]]);
   }
 
   _getFloatingActionButton(String animalUser, bool interesseManifestado, bool interessado) {
@@ -237,7 +244,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
                                           future: _perguntas,
                                           builder: (context, snapshot) {
                                             if (snapshot.hasData) {
-                                              return QuestionAnswersCard(snapshot.data); 
+                                              return QuestionAnswersCard(snapshot.data, () => _openQuestionsScreen(context));
                                             }
                                             return CircularProgressIndicator();
                                           }
