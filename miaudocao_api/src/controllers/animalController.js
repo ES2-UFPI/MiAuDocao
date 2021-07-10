@@ -175,17 +175,42 @@ exports.post = async (req, res, next) => {
             compressedImage,
             0
           ], function (error) {
-            connection.release();
             if (error) {
+              connection.release();
               res.status(400).send({
                 type: 'Database error',
                 description: 'One or more values are invalid (creating animal).'
               });
             } else {
-              res.status(201).send({
-                type: 'Created',
-                description: 'Animal added successfully.',
-                id: id
+              connection.query(`INSERT INTO notificacao (id, user_id, titulo, descricao, data_cadastro, tipo, id_tipo)
+                  SELECT ?, id, ?, ?, ?, ?, ?
+                  FROM usuario
+                  WHERE pref_especie = ? AND pref_porte = ? AND pref_sexo = ? AND pref_faixa_etaria = ?`, [
+                nanoid(20),
+                'Animal com suas preferências!',
+                `O animal ${nome}, que está de acordo com suas preferências, acabou de chegar no MiAuDoção. Confira!`,
+                Date.now(),
+                'animal',
+                id,
+                especie,
+                porte,
+                sexo,
+                faixaEtaria,
+              ], function (error) {
+                connection.release();
+                if (error) {
+                  console.log(error);
+                  res.status(400).send({
+                    type: 'Database error',
+                    description: 'One or more values are invalid (creating notification).'
+                  });
+                } else {
+                  res.status(201).send({
+                    type: 'Created',
+                    description: 'Animal added successfully.',
+                    id: id
+                  });
+                }
               });
             }
           });
