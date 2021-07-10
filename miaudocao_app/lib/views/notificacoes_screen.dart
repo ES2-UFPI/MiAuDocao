@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:miaudocao_app/models/notificacao.dart';
+import 'package:miaudocao_app/utils/app_routes.dart';
 import 'package:miaudocao_app/utils/configs.dart';
 
 class NotificacoesScreen extends StatefulWidget {
@@ -30,11 +31,38 @@ class _NotificacoesScreenState extends State<NotificacoesScreen> {
         _isLoading = false;
       });
 
+      notificacoes.sort((a, b) => b.dataCadastro.compareTo(a.dataCadastro));
+
       return notificacoes;
     } catch (e) {
       print(e);
     }
     return null;
+  }
+
+  void _notificationAction(BuildContext context, String titulo, String tipo, String idTipo) {
+    if (tipo == 'animal') {
+      Navigator.of(context).pushNamed(          
+        AppRoutes.VISUALIZAR_ANIMAL,
+        arguments: [idTipo, widget.userId]
+      );
+    } else {
+      if (titulo == 'Nova pergunta') {
+        Navigator.of(context).pushNamed(          
+          AppRoutes.PERGUNTAS,
+          arguments: [idTipo, widget.userId, 'resposta']
+        );
+      } else {
+        Navigator.of(context).pushNamed(          
+          AppRoutes.VISUALIZAR_ANIMAL,
+          arguments: [idTipo, widget.userId]
+        );
+        Navigator.of(context).pushNamed(          
+          AppRoutes.PERGUNTAS,
+          arguments: [idTipo, widget.userId, 'visualizar']
+        );
+      }
+    }
   }
 
   @override
@@ -86,12 +114,13 @@ class _NotificacoesScreenState extends State<NotificacoesScreen> {
             itemBuilder: (context, index) {
               return Card(
                 child: ListTile(
+                  contentPadding: EdgeInsets.all(10),
                   title: Text(snapshot.data[index].titulo),
                   subtitle: Text(snapshot.data[index].descricao),
                   trailing: Text(DateFormat('dd/MM/yyyy\nHH:mm').format(
                     DateTime.fromMillisecondsSinceEpoch(int.parse(snapshot.data[index].dataCadastro))),
                     textAlign: TextAlign.end),
-                  onTap: () => {},
+                  onTap: () => _notificationAction(context, snapshot.data[index].titulo, snapshot.data[index].tipo, snapshot.data[index].idTipo),
                 ),
               );
             },
