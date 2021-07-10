@@ -43,6 +43,8 @@ exports.post = async (req, res, next) => {
         });
       } else {
         if (results[0]) {
+          const animalOwnerId = results[0].user_id;
+          const animalName = results[0].nome;
           connection.query(`SELECT * FROM usuario WHERE id = ?`, [
             autorId
           ], function (error, results) {
@@ -62,18 +64,36 @@ exports.post = async (req, res, next) => {
                   resposta,
                   data_cadastro
                 ], function (error) {
-                  connection.release();
                   if (error) {
+                    connection.release();
                     res.status(400).send({
                       type: 'Database error',
-                      description: 'One or more values are invalid (validating author).'
+                      description: 'One or more values are invalid (creating question).'
                     });
                   } else {
-                    res.status(201).send({
-                      type: 'Created',
-                      description: 'Question created successfully.',
-                      id: id
-                    });
+                    connection.query(`INSERT INTO notificacao VALUES (?, ?, ?, ?, ?, ?, ?)`, [
+                      nanoid(20),
+                      animalOwnerId,
+                      'Nova pergunta',
+                      `Nova pergunta sobre o animal ${animalName}. Confira!`,
+                      data_cadastro,
+                      'pergunta',
+                      animalId
+                    ], function (error) {
+                      connection.release();
+                      if (error) {
+                        res.status(400).send({
+                          type: 'Database error',
+                          description: 'One or more values are invalid (creating notification).'
+                        });
+                      } else {
+                        res.status(201).send({
+                          type: 'Created',
+                          description: 'Question created successfully.',
+                          id: id
+                        });
+                      }
+                    });                    
                   }
                 });
               } else {
@@ -192,28 +212,79 @@ exports.put = async (req, res, next) => {
       return;
     }
 
-    connection.query(`UPDATE pergunta SET resposta = ? WHERE id_animal = ? AND id = ?`, [
-      resposta,
-      animalId,
+    connection.query(`SELECT * FROM pergunta WHERE id = ?`, [
       perguntaId
     ], function (error, results) {
-      connection.release();
       if (error) {
-        console.log(error);
+        connection.release();
         res.status(400).send({
           type: 'Database error',
           description: 'One or more values are invalid.'
         });
-      } else if (results.affectedRows == 1){
-        res.status(200).send({
-          type: 'Answered',
-          description: 'The question was answered successfully.'
-        });
       } else {
-        res.status(400).send({
-          type: 'Not answered',
-          description: 'Something went wrong. Verify if the animal id or question id and try again.'
-        });
+        if (results[0]) {
+          const questionAuthor = results[0].id_autor;
+          connection.query(`UPDATE pergunta SET resposta = ? WHERE id_animal = ? AND id = ?`, [
+            resposta,
+            animalId,
+            perguntaId
+          ], function (error, results) {
+            if (error) {
+              connection.release();
+              console.log(error);
+              res.status(400).send({
+                type: 'Database error',
+                description: 'One or more values are invalid.'
+              });
+            } else if (results.affectedRows == 1) {
+              connection.query(`SELECT * FROM animal WHERE id = ?`, [
+                animalId
+              ], function(error, results) {
+                if (error) {
+                  connection.release();
+                  res.status(400).send({
+                    type: 'Database error',
+                    description: 'One or more values are invalid.'
+                  });
+                } else if (results[0]) {
+                  connection.query(`INSERT INTO notificacao VALUES (?, ?, ?, ?, ?, ?, ?)`, [
+                    nanoid(20),
+                    questionAuthor,
+                    'Resposta para sua pergunta',
+                    `Sua pergunta para o animal ${results[0].nome} foi respondida.`,
+                    Date.now(),
+                    'pergunta',
+                    animalId
+                  ], function (error) {
+                    connection.release();
+                    if (error) {
+                      res.status(400).send({
+                        type: 'Database error',
+                        description: 'One or more values are invalid.'
+                      });
+                    } else {
+                      res.status(200).send({
+                        type: 'Answered',
+                        description: 'The question was answered successfully.'
+                      });
+                    }
+                  });
+                }
+              });
+            } else {
+              res.status(400).send({
+                type: 'Not answered',
+                description: 'Something went wrong. Verify the animal id or question id and try again.'
+              });
+            }
+          });
+        } else {
+          connection.release();
+          res.status(404).send({
+            type: 'Not found',
+            description: 'The question does not exist.'
+          });
+        }
       }
     });
   }); 
