@@ -8,4 +8,5 @@ class AppRoutes {
   static const PERFIL = '/perfil';
   static const NOTIFICACOES = '/notificacoes';
   static const PERGUNTAS = '/perguntas';
+  static const FAVORITOS = '/favoritos';
 }
