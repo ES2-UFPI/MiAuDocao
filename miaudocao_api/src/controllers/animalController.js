@@ -50,13 +50,33 @@ exports.get = async (req, res, next) => {
                 description: 'One or more values are invalid.'
               });
             } else {
+              let interessado = false;
               if (results[0]) {
-                data = {...data, interessado: true};
-                res.status(200).json(data);
+                interessado = true;
+                // data = {...data, interessado: true};
+                // res.status(200).json(data);
               } else {
-                data = {...data, interessado: false};
-                res.status(200).json(data);
+                interessado = false;
+                // data = {...data, interessado: false};
+                // res.status(200).json(data);
               }
+              connection.query(`SELECT * FROM favorito WHERE usuario_id = ? AND animal_id = ?`, [
+                user,
+                id
+              ], function (error, results) {
+                if (error) {
+                  res.status(400).send({
+                    type: 'Database error',
+                    description: 'One or more values are invalid.'
+                  });
+                } else{
+                  if (results[0]) {
+                    res.status(200).json({ ...data, interessado, favorito: true });
+                  } else {
+                    res.status(200).json({ ...data, interessado, favorito: false });
+                  }
+                }
+              });
             }
           });  
         } else {
