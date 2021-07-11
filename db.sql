@@ -58,3 +58,9 @@ CREATE TABLE pergunta (
     resposta VARCHAR(200),
     data_cadastro long
 );
+
+CREATE TABLE favorito (
+    id VARCHAR(20) NOT NULL,
+    usuario_id VARCHAR(20) NOT NULL,
+    animal_id VARCHAR(20) NOT NULL
+);
