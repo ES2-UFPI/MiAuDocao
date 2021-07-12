@@ -91,3 +91,40 @@ exports.post = (req, res, next) => {
     });
   });
 }
+
+exports.get = (req, res, next) => {
+  const userId = req.params.user_id;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.status(500).send({
+        type: 'Database error',
+        description: 'Something went wrong. Try again.'
+      });
+
+      return;
+    }
+
+    connection.query(`SELECT * FROM (
+        SELECT a.id, i.usuario_id, a.foto, a.nome, a.descricao
+        FROM animal a
+          INNER JOIN favorito i
+          ON a.id = i.animal_id
+      ) AS r WHERE r.usuario_id = ?`, [
+      userId
+    ], function (error, results) {
+      connection.release();
+      if (error) {
+        res.status(400).send({
+          type: 'Database error',
+          description: 'One or more values are invalid (validating user).'
+        });
+      } else {
+        results.forEach((element, index) => {
+          results[index].foto = element.foto.toString();
+        });
+        res.status(200).send(results);
+      }
+    });
+  });
+}

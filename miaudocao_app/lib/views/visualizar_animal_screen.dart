@@ -31,6 +31,7 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
   Size _bodySize = Size(0, 0);
   Size _floatingActionButtonSize = Size(0, 0);
   bool _interesseManifestado = false;
+  bool _favorito = false;
 
   final Dio _dio = Dio();
   Future<Animal> _animal;
@@ -46,6 +47,9 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
               'user': widget._animalAndUserId[1]
             }
           );
+      setState(() {
+        _favorito = response.data['favorito'];
+      });
       return Animal.fromJson(response.data);
     } catch (e) {
       print(e);
@@ -68,6 +72,23 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     }
 
     return null;
+  }
+
+  void _saveFavorito() async {
+    try {
+      await this._dio.post('${Configs.API_URL}/favorito',
+        data: {
+          'user_id': widget._animalAndUserId[1],
+          'animal_id': widget._animalAndUserId[0]
+        }
+      );
+
+      setState(() {
+        _favorito = true;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   _showSnackBar(BuildContext context, String message) {
@@ -177,7 +198,12 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
           appBar: AppBar(
             title: Text('Informações do animal'),
             actions: [
-              IconButton(icon: Icon(Icons.favorite_outline), onPressed: () => {})
+              IconButton(
+                icon: _favorito
+                  ? Icon(Icons.favorite)
+                  : Icon(Icons.favorite_outline),
+                onPressed: () => _saveFavorito()
+              )
             ],
           ),
           body: Measurer(

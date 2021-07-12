@@ -98,6 +98,13 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
+              icon: Icon(Icons.favorite),
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRoutes.FAVORITOS,
+                arguments: widget.connectedUser.id
+              ),
+            ),
+            IconButton(
               icon: Icon(Icons.notifications),
               onPressed: () => Navigator.of(context).pushNamed(
                 AppRoutes.NOTIFICACOES,
