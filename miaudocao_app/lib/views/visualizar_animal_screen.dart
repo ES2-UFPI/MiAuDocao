@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:measurer/measurer.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/animal_facade.dart';
 import 'package:miaudocao_app/models/pergunta.dart';
+import 'package:miaudocao_app/models/pergunta_facade.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
-import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/utils/places_service.dart';
 import 'package:miaudocao_app/widgets/address_details_modal.dart';
 import 'package:miaudocao_app/widgets/address_info_card.dart';
@@ -33,62 +33,27 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
   bool _interesseManifestado = false;
   bool _favorito = false;
 
-  final Dio _dio = Dio();
   Future<Animal> _animal;
   Future<List<Pergunta>> _perguntas;
-  
+
   Future<Animal> fetchAnimal() async {
-    try {
-      final response = await this
-          ._dio
-          .get('${Configs.API_URL}/animais',
-            queryParameters: {
-              'id': widget._animalAndUserId[0],
-              'user': widget._animalAndUserId[1]
-            }
-          );
-      setState(() {
-        _favorito = response.data['favorito'];
-      });
-      return Animal.fromJson(response.data);
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    Animal animal = await AnimalFacade.fetchAnimal(widget._animalAndUserId[0], widget._animalAndUserId[1]);
+    setState(() {
+      _favorito = animal.favorito;
+    });
+
+    return animal;
   }
 
   Future<List<Pergunta>> _fetchPerguntas() async {
-    try {
-      final response = await this
-          ._dio
-          .get('${Configs.API_URL}/animais/${widget._animalAndUserId[0]}/pergunta/all');
-      
-      final List<Pergunta> perguntas =
-          (response.data as List).map((item) => Pergunta.fromJson(item)).toList();
-
-      return perguntas;
-    } catch (e) {
-      print(e);
-    }
-
-    return null;
+    return PerguntaFacade.fetchPerguntas(widget._animalAndUserId[0]);
   }
 
   void _saveFavorito() async {
-    try {
-      await this._dio.post('${Configs.API_URL}/favorito',
-        data: {
-          'user_id': widget._animalAndUserId[1],
-          'animal_id': widget._animalAndUserId[0]
-        }
-      );
-
-      setState(() {
-        _favorito = true;
-      });
-    } catch (e) {
-      print(e);
-    }
+    await AnimalFacade.saveFavorito(widget._animalAndUserId[0], widget._animalAndUserId[1]);
+    setState(() {
+      _favorito = true;
+    });
   }
 
   _showSnackBar(BuildContext context, String message) {
@@ -102,21 +67,14 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
 
   void _manifestarInteresse(BuildContext context) async {
     context.loaderOverlay.show();
-    try {
-      await this._dio.post(
-        '${Configs.API_URL}/manifestar_interesse',
-        queryParameters: {
-          'animal': widget._animalAndUserId[0],
-          'user': widget._animalAndUserId[1]
-        }
-      );
-      context.loaderOverlay.hide();
+    bool response = await AnimalFacade.manifestarInteresse(widget._animalAndUserId[0], widget._animalAndUserId[1]);
+    context.loaderOverlay.hide();
+    if (response) {
       _showSnackBar(context, 'Interesse registrado com sucesso');
       setState(() {
         _interesseManifestado = true;
       });
-    } catch (e) {
-      print(e);
+    } else {
       _showSnackBar(context, 'Algo deu errado.');
     }
   }
