@@ -1,7 +1,6 @@
 const { nanoid } = require('nanoid');
 const request = require('supertest');
 const app = require('../src/app');
-// const { createUser, createAnimal, deleteAll, disableForeignCheck } = require('../src/utils/dbTestUtils');
 
 describe('Animal POST', () => {
   let userId;
@@ -343,5 +342,303 @@ describe('Animal GET (interessados)', () => {
   it('deve retornar uma lista de usuários com interesse em um animal', async () => {
     const res = await request(app).get(`/animais/interessados?id=${animalId2}`);
     expect(res.body.length).toBe(0);
+  });
+});
+
+describe('Animal POST (pergunta)', () => {
+  let userId;
+  let animalId;
+  let userId2;
+
+  beforeAll(async () => {
+    const userRes = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId = userRes.body['id'];
+
+    const animalRes = await request(app).post('/animais')
+      .send({
+        'user_id': userId,
+        'nome': 'Animal',
+        'descricao': 'Um animal',
+        'especie': 'gato',
+        'porte': 'pequeno',
+        'sexo': 'macho',
+        'faixa_etaria': 'jovem',
+        'endereco': 'rua x',
+        'latitude': '10',
+        'longitude': '10',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
+      });
+    animalId = animalRes.body['id'];
+
+    const userRes2 = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario2',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId2 = userRes2.body['id'];
+  });
+
+  it('deve enviar uma pergunta para um animal', async () => {
+    const res = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': 'Uma pergunta aqui'
+      });
+    expect(res.statusCode).toBe(201);
+  });
+
+  it('deve falhar ao enviar uma pergunta vazia para um animal', async () => {
+    const res = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': ''
+      });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+describe('Animal GET (pergunta)', () => {
+  let userId;
+  let animalId;
+  let userId2;
+  let perguntaId;
+
+  beforeAll(async () => {
+    const userRes = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId = userRes.body['id'];
+
+    const animalRes = await request(app).post('/animais')
+      .send({
+        'user_id': userId,
+        'nome': 'Animal',
+        'descricao': 'Um animal',
+        'especie': 'gato',
+        'porte': 'pequeno',
+        'sexo': 'macho',
+        'faixa_etaria': 'jovem',
+        'endereco': 'rua x',
+        'latitude': '10',
+        'longitude': '10',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
+      });
+    animalId = animalRes.body['id'];
+
+    const userRes2 = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario2',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId2 = userRes2.body['id'];
+
+    const perguntaRes = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': 'Uma pergunta aqui'
+      });
+    perguntaId = perguntaRes.body['id'];
+  });
+
+  it('deve requisitar detalhes de uma pergunta', async () => {
+    const res = await request(app).get(`/animais/${animalId}/pergunta/${perguntaId}`);
+    expect(res.status).toBe(200);
+  });
+
+  it('deve falhar ao requisitar uma pergunta inexistente', async () => {
+    const res = await request(app).get(`/animais/${animalId}/pergunta/um_id_aqui`);
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('Animal GET (perguntas)', () => {
+  let userId;
+  let animalId;
+  let userId2;
+  let perguntaId;
+  let perguntaId2;
+
+  beforeAll(async () => {
+    const userRes = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId = userRes.body['id'];
+
+    const animalRes = await request(app).post('/animais')
+      .send({
+        'user_id': userId,
+        'nome': 'Animal',
+        'descricao': 'Um animal',
+        'especie': 'gato',
+        'porte': 'pequeno',
+        'sexo': 'macho',
+        'faixa_etaria': 'jovem',
+        'endereco': 'rua x',
+        'latitude': '10',
+        'longitude': '10',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
+      });
+    animalId = animalRes.body['id'];
+
+    const userRes2 = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario2',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId2 = userRes2.body['id'];
+
+    const perguntaRes = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': 'Uma pergunta aqui'
+      });
+    perguntaId = perguntaRes.body['id'];
+
+    const perguntaRes2 = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': 'Outra pergunta aqui'
+      });
+    perguntaId2 = perguntaRes2.body['id'];
+  });
+
+  it('deve retornar uma lista de perguntas para um animal', async () => {
+    const res = await request(app).get(`/animais/${animalId}/pergunta/all`);
+    expect(res.body.length).toBe(2);
+  });
+
+  it('deve retornar uma lista vazia para um animal inexistente', async () => {
+    const res = await request(app).get(`/animais/um_id_aqui/pergunta/all`);
+    expect(res.body.length).toBe(0);
+  });
+});
+
+describe('Animal PUT (pergunta)', () => {
+  let userId;
+  let animalId;
+  let userId2;
+  let perguntaId;
+
+  beforeAll(async () => {
+    const userRes = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId = userRes.body['id'];
+
+    const animalRes = await request(app).post('/animais')
+      .send({
+        'user_id': userId,
+        'nome': 'Animal',
+        'descricao': 'Um animal',
+        'especie': 'gato',
+        'porte': 'pequeno',
+        'sexo': 'macho',
+        'faixa_etaria': 'jovem',
+        'endereco': 'rua x',
+        'latitude': '10',
+        'longitude': '10',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII='
+      });
+    animalId = animalRes.body['id'];
+
+    const userRes2 = await request(app).post('/usuario')
+      .send({
+        'nome': 'Usuario2',
+        'foto': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/h/kg8ABKEB16zW65EAAAAASUVORK5CYII=',
+        'email': nanoid(20),
+        'telefone': '1234',
+        'password': '1234',
+        'pref_especie': 'gato',
+        'pref_porte': 'pequeno',
+        'pref_sexo': 'macho',
+        'pref_faixa_etaria': 'jovem',
+        'pref_raio_busca': 2
+      });
+    userId2 = userRes2.body['id'];
+
+    const perguntaRes = await request(app).post(`/animais/${animalId}/pergunta`)
+      .send({
+        'autor_id': userId2,
+        'pergunta': 'Uma pergunta aqui'
+      });
+    perguntaId = perguntaRes.body['id'];
+  });
+
+  it('deve responder uma pergunta com sucesso', async () => {
+    const res = await request(app).put(`/animais/${animalId}/pergunta/${perguntaId}/responder`)
+      .send({ 'resposta': 'Uma resposta aqui' });
+    expect(res.status).toBe(200);
+  });
+
+  it('deve falhar ao responder uma pergunta inexistente', async () => {
+    const res = await request(app).put(`/animais/${animalId}/pergunta/um_id_aqui/responder`)
+      .send({ 'resposta': 'Uma resposta aqui' });
+    expect(res.status).toBe(400);
   });
 });
