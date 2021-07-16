@@ -1,17 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:miaudocao_app/utils/configs.dart';
+import 'package:miaudocao_app/models/animal_facade.dart';
 import '../models/animal.dart';
 import '../widgets/animal_form.dart';
 
-
-
 // ignore: must_be_immutable
 class CadastrarAnimalScreen extends StatelessWidget {
-  final Dio _dio = Dio();
   final String userId;
   CadastrarAnimalScreen(this.userId);
 
@@ -44,39 +38,32 @@ class CadastrarAnimalScreen extends StatelessWidget {
     );
   }
 
-  _submitRegister(Animal animal, BuildContext context) async {
+  void _submitRegister(Animal animal, BuildContext context) async {
     context.loaderOverlay.show();
-    try {
-      final response = await this._dio.post(
-        '${Configs.API_URL}/animais', 
-        data: json.encode({
-          'user_id': userId,
-          'nome': animal.nome,
-          'descricao': animal.descricao,
-          'especie': animal.especie,
-          'porte': animal.porte,
-          'sexo': animal.sexo,
-          'faixa_etaria': animal.faixaEtaria,
-          'endereco': animal.endereco,
-          'latitude': animal.coordinates.latitude,
-          'longitude': animal.coordinates.longitude,
-          'foto': animal.foto,
-        })
-      );
+    bool registered = await AnimalFacade.registerAnimal(
+      userId: userId,
+      nome: animal.nome,
+      descricao: animal.descricao,
+      especie: animal.especie,
+      porte: animal.porte,
+      sexo: animal.sexo,
+      faixaEtaria: animal.faixaEtaria,
+      endereco: animal.endereco,
+      latitude: animal.coordinates.latitude.toString(),
+      longitude: animal.coordinates.longitude.toString(),
+      foto: animal.foto,
+    );
+    context.loaderOverlay.hide();
 
-      context.loaderOverlay.hide();
-      if (response.statusCode == 201) {
-        _showSnackBar(context, 'Animal cadastrado com sucesso!');
+    if (registered == true) {
+      _showSnackBar(context, 'Animal cadastrado com sucesso!');
         Navigator.of(context).pop();
-      }
-    } catch (e) {
-      print(e);
-      context.loaderOverlay.hide();
+    } else {
       Navigator.of(context).pop();
       _showAlertDialog(
         context,
         'Algo deu errado',
-        'Estamos com dificuldades de processar sua solicitação no momento. '
+        'Não conseguimos cadastrar o animal no momento. '
             + 'Você pode verificar os dados enviados ou tentar novamente mais '
             + 'tarde.'
       );
