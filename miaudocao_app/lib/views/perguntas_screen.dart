@@ -123,7 +123,12 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perguntas'),
+        title: Text(
+          'Perguntas',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          )
+        ),
       ),
       body: Column(
         children: [

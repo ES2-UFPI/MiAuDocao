@@ -154,7 +154,12 @@ class _VisualizarAnimalScreenState extends State<VisualizarAnimalScreen> {
     return LoaderOverlay(
       child: Scaffold(
           appBar: AppBar(
-            title: Text('Informações do animal'),
+            title: Text(
+              'Informações do animal',
+              style: TextStyle(
+                fontWeight: FontWeight.bold
+              )
+            ),
             actions: [
               IconButton(
                 icon: _favorito

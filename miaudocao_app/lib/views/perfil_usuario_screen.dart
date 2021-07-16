@@ -36,7 +36,12 @@ class _PerfilUsuarioScreenState extends State<PerfilUsuarioScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil'),
+        title: Text(
+          'Perfil',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          )
+        ),
       ),
       body: FutureBuilder(
           builder: (context, snapshot) {
