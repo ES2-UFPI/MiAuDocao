@@ -1,9 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:miaudocao_app/models/notificacao.dart';
+import 'package:miaudocao_app/models/notificacao_facade.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
-import 'package:miaudocao_app/utils/configs.dart';
 
 class NotificacoesScreen extends StatefulWidget {
   final String userId;
@@ -14,30 +13,15 @@ class NotificacoesScreen extends StatefulWidget {
 }
 
 class _NotificacoesScreenState extends State<NotificacoesScreen> {
-  final Dio _dio = new Dio();
   Future<List<Notificacao>> _notificacoes;
   bool _isLoading = true;
 
   Future<List<Notificacao>> _fetchNotifications() async {
     setState(() => _isLoading = true);
-    try {
-      final response =
-          await this._dio.get('${Configs.API_URL}/usuario/${widget.userId}/notificacoes');
+    List<Notificacao> notificacoes = await NotificacaoFacade.fetchNotificacoes(widget.userId);
+    setState(() => _isLoading = false);
 
-      final List<Notificacao> notificacoes =
-          (response.data as List).map((item) => Notificacao.fromJson(item)).toList();
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      notificacoes.sort((a, b) => b.dataCadastro.compareTo(a.dataCadastro));
-
-      return notificacoes;
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    return notificacoes;
   }
 
   void _notificationAction(BuildContext context, String titulo, String tipo, String idTipo) {

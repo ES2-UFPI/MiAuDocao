@@ -1,9 +1,6 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:miaudocao_app/models/pergunta.dart';
-import 'package:miaudocao_app/utils/configs.dart';
+import 'package:miaudocao_app/models/pergunta_facade.dart';
 import 'package:miaudocao_app/widgets/custom_textfield.dart';
 
 class PerguntasScreen extends StatefulWidget {
@@ -15,7 +12,6 @@ class PerguntasScreen extends StatefulWidget {
 }
 
 class _PerguntasScreenState extends State<PerguntasScreen> {
-  final Dio _dio = Dio();
   Future<List<Pergunta>> _perguntas;
   bool _isLoading = false;
   bool _isSending = false;
@@ -24,63 +20,32 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
 
   Future<List<Pergunta>> _fetchPerguntas() async {
     setState(() => _isLoading = true);
-    try {
-      final response = await this
-          ._dio
-          .get('${Configs.API_URL}/animais/${widget.arguments[0]}/pergunta/all');
-      
-      final List<Pergunta> perguntas =
-          (response.data as List).map((item) => Pergunta.fromJson(item)).toList();
-      setState(() => _isLoading = false);
-
-      perguntas.sort((a, b) => b.dataCadastro.compareTo(a.dataCadastro));
-
-      return perguntas;
-    } catch (e) {
-      print(e);
-    }
-
-    return null;
+    List<Pergunta> perguntas = await PerguntaFacade.fetchPerguntas(widget.arguments[0]);
+    setState(() => _isLoading = false);
+    return perguntas;
   }
 
   void _sendQuestion(BuildContext context) async {
     FocusScope.of(context).unfocus();
     setState(() => _isSending = true);
-    try {
-      await this._dio.post('${Configs.API_URL}/animais/${widget.arguments[0]}/pergunta',
-        data: json.encode({
-          'autor_id': widget.arguments[1],
-          'pergunta': _perguntaController.text
-        })
-      );
-      setState(() {
-        _perguntas = _fetchPerguntas();
-        _perguntaController.clear();
-        _isSending = false;
-      });
-    } on DioError catch (e) {
-      print(e.response);
-    }
+    await PerguntaFacade.sendQuestion(widget.arguments[0], widget.arguments[1], _perguntaController.text);
+    setState(() {
+      _perguntas = _fetchPerguntas();
+      _perguntaController.clear();
+      _isSending = false;
+    });
   }
 
   void _sendAnswer(BuildContext context, String animalId, String perguntaId) async {
     FocusScope.of(context).unfocus();
     setState(() => _isSending = true);
-    try {
-      await this._dio.put('${Configs.API_URL}/animais/${animalId}/pergunta/${perguntaId}/responder',
-        data: json.encode({
-          'resposta': _respostaController.text
-        })
-      );
-      Navigator.of(context).pop();
-      setState(() {
-        _perguntas = _fetchPerguntas();
-        _respostaController.clear();
-        _isSending = false;
-      });
-    } on DioError catch (e) {
-      print(e.response);
-    }
+    await PerguntaFacade.sendAnswer(animalId, perguntaId, _respostaController.text);
+    Navigator.of(context).pop();
+    setState(() {
+      _perguntas = _fetchPerguntas();
+      _respostaController.clear();
+      _isSending = false;
+    });
   }
 
   void _openAnswerModal(BuildContext context, String pergunta, String animalId, String perguntaId) {
@@ -158,7 +123,12 @@ class _PerguntasScreenState extends State<PerguntasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perguntas'),
+        title: Text(
+          'Perguntas',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          )
+        ),
       ),
       body: Column(
         children: [

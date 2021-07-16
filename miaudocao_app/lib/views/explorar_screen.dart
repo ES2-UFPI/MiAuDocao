@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:location/location.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/animal_facade.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
-import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -24,7 +23,6 @@ const double CAMERA_ZOOM = 16;
 const LatLng SOURCE_LOCATION = LatLng(-5.090717, -42.817781);
 
 class _ExplorarScreenState extends State<ExplorarScreen> {
-  final Dio _dio = Dio();
   // Map and location attributes
   Location _location = new Location();
   Completer<GoogleMapController> _controller = Completer();
@@ -110,36 +108,27 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
   }
 
   Future<void> _fetchSearch() async {
-    try {
-      final response = await this._dio.get(
-        '${Configs.API_URL}/busca',
-        queryParameters: {
-          'especie': _especie,
-          'porte': _porte,
-          'sexo': _sexo,
-          'faixa': _faixaEtaria,
-          'lat': _currentLocation.latitude.toString(),
-          'lng': _currentLocation.longitude.toString(),
-          'raio': _radius
-        }
+    List<Animal> animais = await AnimalFacade.searchAnimals(
+      especie: _especie.toLowerCase(),
+      porte: _porte.toLowerCase(),
+      sexo: _sexo.toLowerCase(),
+      faixaEtaria: _faixaEtaria.toLowerCase(),
+      latitude: _currentLocation.latitude.toString(),
+      longitude: _currentLocation.longitude.toString(),
+      raio: _radius
+    );
+    _markers.clear();
+    for (var i=0; i<animais.length; i++) {
+      print(animais[i].endereco);
+      _setMarkers(
+        LatLng(animais[i].coordinates.latitude, animais[i].coordinates.longitude),
+        animais[i].id
       );
-      final List<Animal> animais = (response.data as List)
-          .map((item) => Animal.fromJson(item)).toList();
-      _markers.clear();
-      for (var i=0; i<animais.length; i++) {
-        print(animais[i].endereco);
-        _setMarkers(
-          LatLng(animais[i].coordinates.latitude, animais[i].coordinates.longitude),
-          animais[i].id
-        );
-      }
-      print(_currentLocation.latitude);
-      _circles.clear();
-      _setCircles(LatLng(_currentLocation.latitude, _currentLocation.longitude));
-      _moveCamera();
-    } catch (e) {
-      print(e);
     }
+    print(_currentLocation.latitude);
+    _circles.clear();
+    _setCircles(LatLng(_currentLocation.latitude, _currentLocation.longitude));
+    _moveCamera();
   }
 
   Future<void> _moveCamera() async {

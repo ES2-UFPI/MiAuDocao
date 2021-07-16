@@ -45,7 +45,12 @@ class _InteressadosScreenState extends State<InteressadosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interessados'),
+        title: Text(
+          'Interessados',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          )
+        ),
       ),
       body: _isLoading
         ? Center(child: CircularProgressIndicator())
