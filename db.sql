@@ -39,3 +39,28 @@ CREATE TABLE interesse_animal (
     user_id VARCHAR(20) NOT NULL,
     animal_id VARCHAR(20) NOT NULL
 );
+
+CREATE TABLE notificacao (
+    id VARCHAR(20) NOT NULL,
+    user_id VARCHAR(20) NOT NULL,
+    titulo  VARCHAR(30),
+    descricao VARCHAR(100),
+    data_cadastro long,
+    tipo ENUM('animal', 'pergunta') NOT NULL,
+    id_tipo VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE pergunta (
+	id VARCHAR(20) NOT NULL,
+    id_autor VARCHAR(20) NOT NULL,
+    id_animal VARCHAR(20) NOT NULL,
+    pergunta VARCHAR(200),
+    resposta VARCHAR(200),
+    data_cadastro long
+);
+
+CREATE TABLE favorito (
+    id VARCHAR(20) NOT NULL,
+    usuario_id VARCHAR(20) NOT NULL,
+    animal_id VARCHAR(20) NOT NULL
+);

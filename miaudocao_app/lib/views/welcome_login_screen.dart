@@ -1,14 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:miaudocao_app/models/usuario.dart';
+import 'package:miaudocao_app/models/usuario_facade.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
-import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/widgets/custom_textfield.dart';
 
 class WelcomeLoginScreen extends StatelessWidget {
-  final Dio _dio = Dio();
-
   _showSnackBar(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
     scaffold.showSnackBar(SnackBar(content: Text(message)));
@@ -16,20 +13,14 @@ class WelcomeLoginScreen extends StatelessWidget {
 
   void _login(String email, BuildContext context) async {
     context.loaderOverlay.show();
-    try {
-      final response =
-          await this._dio.get('${Configs.API_URL}/usuario?email=${email}');
-      context.loaderOverlay.hide();
-      if (response.statusCode == 200) {
-        Navigator.of(context).pushNamed(AppRoutes.DASHBOARD,
-            arguments: Usuario.fromJson(response.data));
-      }
-    } catch (e) {
-      context.loaderOverlay.hide();
+    Usuario usuario = await UsuarioFacade.fetchUserByEmail(email);
+    context.loaderOverlay.hide();
+    if (usuario != null) {
+      Navigator.of(context).pushNamed(AppRoutes.DASHBOARD,
+          arguments: usuario);
+    } else {
       _showSnackBar(context, 'Usuário não encontrado.');
-      print(e);
     }
-    return null;
   }
 
   final _emailInputController = TextEditingController();

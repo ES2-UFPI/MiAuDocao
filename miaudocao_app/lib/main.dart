@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/views/cadastrar_usuario_screen.dart';
+import 'package:miaudocao_app/views/favoritos_screen.dart';
 import 'package:miaudocao_app/views/interessados_screen.dart';
+import 'package:miaudocao_app/views/notificacoes_screen.dart';
 import 'package:miaudocao_app/views/perfil_usuario_screen.dart';
+import 'package:miaudocao_app/views/perguntas_screen.dart';
 import 'package:miaudocao_app/views/tabs_screen.dart';
 import 'package:miaudocao_app/views/welcome_login_screen.dart';
 import './utils/app_routes.dart';
@@ -58,6 +61,30 @@ class MyApp extends StatelessWidget {
 
           return MaterialPageRoute(builder: (context) {
             return PerfilUsuarioScreen(argument);
+          });
+        }
+        
+        if (settings.name == AppRoutes.NOTIFICACOES) {
+          final String argument = settings.arguments;
+          
+          return MaterialPageRoute(builder: (context) {
+            return NotificacoesScreen(argument);
+          });
+        }
+
+        if (settings.name == AppRoutes.PERGUNTAS) {
+          final List<String> arguments = settings.arguments;
+
+          return MaterialPageRoute(builder: (context) {
+            return PerguntasScreen(arguments);
+          });
+        }
+
+        if (settings.name == AppRoutes.FAVORITOS) {
+          final String argument = settings.arguments;
+
+          return MaterialPageRoute(builder: (context) {
+            return FavoritosScreen(argument);
           });
         }
 

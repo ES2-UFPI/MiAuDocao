@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/animal_facade.dart';
 import 'package:miaudocao_app/models/usuario.dart';
 import 'package:miaudocao_app/utils/app_routes.dart';
-import 'package:miaudocao_app/utils/configs.dart';
 import 'package:miaudocao_app/views/cadastrar_animal_screen.dart';
 import 'package:miaudocao_app/widgets/animal_item.dart';
 
@@ -20,49 +19,30 @@ class EspacoUsuarioScreen extends StatefulWidget {
 }
 
 class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
-  Dio _dio = Dio();
   Future _animais;
   bool _isLoading = true;
 
   Future _getUserAnimals() async {
-    print(widget.connectedUser.id);
-    try {
-      final response = await this._dio.get('${Configs.API_URL}/usuario/animais',
-          queryParameters: {'user': widget.connectedUser.id});
-      final List<Animal> animais =
-          (response.data as List).map((item) => Animal.fromJson(item)).toList();
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      animais.sort((a, b) => b.data.compareTo(a.data));
-
-      return animais;
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    List<Animal> animais = await AnimalFacade.fetchUserAnimals(widget.connectedUser.id);
+    setState(() => _isLoading = false);
+    return animais;
   }
 
   void _onShowInteressados(BuildContext context, String animalId) {
     Navigator.of(context).pushNamed(AppRoutes.INTERESSADOS, arguments: animalId);
   }
 
+  void _onShowQuestions(BuildContext context, String animalId, String userId) {
+    Navigator.of(context).pushNamed(
+      AppRoutes.PERGUNTAS,
+      arguments: [animalId, userId, 'resposta']);
+  }
+
   void _marcarAdotado(String animalId, BuildContext context) async {
     context.loaderOverlay.show();
-    try {
-      this._dio.put(
-        '${Configs.API_URL}/animais/marcar_adotado',
-        queryParameters: {
-          'id': animalId
-        }
-      );
-      context.loaderOverlay.hide();
-      await _updateUserAnimals();
-    } catch (e) {
-      print(e);
-    }
+    await AnimalFacade.markAnimalAsAdopted(animalId);
+    context.loaderOverlay.hide();
+    await _updateUserAnimals();
   }
 
   void _updateUserAnimals() {
@@ -91,6 +71,20 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
           ),
           automaticallyImplyLeading: false,
           actions: [
+            IconButton(
+              icon: Icon(Icons.favorite),
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRoutes.FAVORITOS,
+                arguments: widget.connectedUser.id
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.notifications),
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRoutes.NOTIFICACOES,
+                arguments: widget.connectedUser.id
+              ),
+            ),
             IconButton(
               icon: Icon(Icons.logout),
               onPressed: () => Navigator.of(context).pop()
@@ -222,6 +216,7 @@ class _EspacoUsuarioScreenState extends State<EspacoUsuarioScreen> {
                               adotado: snapshot.data[index].adotado,
                               showOptions: true,
                               showInteressados: () => _onShowInteressados(context, snapshot.data[index].id),
+                              showQuestions: () => _onShowQuestions(context, snapshot.data[index].id, widget.connectedUser.id),
                               marcarAdotado: () => _marcarAdotado(snapshot.data[index].id, context),
                             );
                           },

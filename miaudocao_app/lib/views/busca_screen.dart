@@ -1,10 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:miaudocao_app/models/animal.dart';
+import 'package:miaudocao_app/models/animal_facade.dart';
 import 'package:miaudocao_app/models/usuario.dart';
-import 'package:miaudocao_app/utils/configs.dart';
+import 'package:miaudocao_app/models/usuario_facade.dart';
 import 'package:miaudocao_app/widgets/animal_item.dart';
 import 'package:miaudocao_app/widgets/centralized_tip_text.dart';
 import 'package:miaudocao_app/widgets/search_filters_modal.dart';
@@ -18,7 +18,6 @@ class BuscaScreen extends StatefulWidget {
 }
 
 class _BuscaScreenState extends State<BuscaScreen> {
-  final Dio _dio = Dio();
   String _especie = '';
   String _porte = '';
   String _sexo = '';
@@ -37,19 +36,10 @@ class _BuscaScreenState extends State<BuscaScreen> {
   Usuario _usuario;
 
   void _getUserDetails(String id) async {
-    try {
-      await this
-          ._dio
-          .get('${Configs.API_URL}/usuario?email=${id}')
-          .then((response) {
-        setState(() {
-          _usuario = Usuario.fromJson(response.data);
-        });
-      });
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    Usuario usuario = await UsuarioFacade.fetchUserById(id);
+    setState(() {
+      _usuario = usuario;
+    });
   }
 
   void _updateSearch(String especie, String porte, String sexo,
@@ -87,39 +77,29 @@ class _BuscaScreenState extends State<BuscaScreen> {
 
   Future _fetchSearch() async {
     setState(() => _isLoading = true);
-    try {
-      final response =
-          await this._dio.get('${Configs.API_URL}/busca', queryParameters: {
-        'especie': _especie,
-        'porte': _porte,
-        'sexo': _sexo,
-        'faixa': _faixaEtaria,
-        'lat': _currentLocation.latitude.toString(),
-        'lng': _currentLocation.longitude.toString(),
-        'raio': _raio
-      });
-      final List<Animal> animais =
-          (response.data as List).map((item) => Animal.fromJson(item)).toList();
+    List<Animal> animais = await AnimalFacade.searchAnimals(
+      especie: _especie.toLowerCase(),
+      porte: _porte.toLowerCase(),
+      sexo: _sexo.toLowerCase(),
+      faixaEtaria: _faixaEtaria.toLowerCase(),
+      latitude: _currentLocation.latitude.toString(),
+      longitude: _currentLocation.longitude.toString(),
+      raio: _raio
+    );
 
-      if (_ordenacao == 'Data mais recente') {
-        animais.sort((a, b) => b.data.compareTo(a.data));
-      } else if (_ordenacao == 'Data mais antiga') {
-        animais.sort((a, b) => a.data.compareTo(b.data));
-      } else if (_ordenacao == 'Mais próximo') {
-        print('MAIS PRÓXIMO');
-        animais.sort((a, b) => a.distancia.compareTo(b.distancia));
-      } else if (_ordenacao == 'Mais distante') {
-        print('MAIS DISTANTE');
-        animais.sort((a, b) => b.distancia.compareTo(a.distancia));
-      }
-
-      setState(() => _isLoading = false);
-
-      return animais;
-    } catch (e) {
-      print(e);
+    if (_ordenacao == 'Data mais recente') {
+      animais.sort((a, b) => b.data.compareTo(a.data));
+    } else if (_ordenacao == 'Data mais antiga') {
+      animais.sort((a, b) => a.data.compareTo(b.data));
+    } else if (_ordenacao == 'Mais próximo') {
+      animais.sort((a, b) => a.distancia.compareTo(b.distancia));
+    } else if (_ordenacao == 'Mais distante') {
+      animais.sort((a, b) => b.distancia.compareTo(a.distancia));
     }
-    return null;
+
+    setState(() => _isLoading = false);
+
+    return animais;
   }
 
   void _getLocation() async {
@@ -132,8 +112,8 @@ class _BuscaScreenState extends State<BuscaScreen> {
       return;
     }
 
-    setState(() async {
-      await _getUserDetails(widget.connectedUserId);
+    await _getUserDetails(widget.connectedUserId);
+    setState(() {
       _especie = toBeginningOfSentenceCase(_usuario.prefEspecie);
       _porte = toBeginningOfSentenceCase(_usuario.prefPorte);
       _sexo = toBeginningOfSentenceCase(_usuario.prefSexo);

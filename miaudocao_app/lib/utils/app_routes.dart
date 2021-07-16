@@ -6,4 +6,7 @@ class AppRoutes {
   static const DASHBOARD = '/principal';
   static const INTERESSADOS = '/interessados';
   static const PERFIL = '/perfil';
+  static const NOTIFICACOES = '/notificacoes';
+  static const PERGUNTAS = '/perguntas';
+  static const FAVORITOS = '/favoritos';
 }
